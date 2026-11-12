@@ -133,3 +133,30 @@ SOF309_<MÃ_LỚP>_<MSSV>_<HoTen>/
 | **B (7.0 - 7.9)** | **Y1 đến Y5** | • Web chạy tốt, có kịch bản test, JUnit, Selenium và CI/CD Actions chạy pass (thiếu hoặc chưa hoàn chỉnh minh chứng AI Y6). |
 | **C (5.0 - 6.9)** | **Y1 đến Y3** | • Web chạy được, có Test Plan/Test Case và chạy được Unit test JUnit (chưa làm Selenium UI và CI/CD). |
 | **D (< 5.0)** | **Dưới 3 yêu cầu** | • Không hoàn thành đủ các yêu cầu cơ bản $\rightarrow$ **Học lại**. |
+
+---
+
+## Chạy ShopPulse local
+
+Yêu cầu JDK 17+ và Maven 3.8+. Từ thư mục gốc:
+
+```bash
+mvn spring-boot:run
+```
+
+Mở `http://localhost:8080`. Backend dùng H2 in-memory; tài khoản và sản phẩm tạo trong lúc chạy sẽ bị xóa khi dừng ứng dụng. Không có tài khoản mẫu; tạo tài khoản qua màn hình Đăng ký hoặc API.
+
+### API tuần 1
+
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| `POST` | `/api/auth/register` | Tạo tài khoản và session |
+| `POST` | `/api/auth/login` | Đăng nhập bằng email/điện thoại |
+| `GET` | `/api/auth/me` | Lấy tài khoản hiện tại |
+| `POST` | `/api/auth/logout` | Đăng xuất |
+| `GET` | `/api/products` | Liệt kê sản phẩm (công khai) |
+| `POST` | `/api/products` | Tạo sản phẩm (cần đăng nhập) |
+| `PUT` | `/api/products/{id}` | Sửa sản phẩm (cần đăng nhập) |
+| `DELETE` | `/api/products/{id}` | Xóa sản phẩm (cần đăng nhập) |
+
+Xem [đặc tả](docs/SPECIFICATIONS.md), [test plan](docs/TEST_PLAN.md) và [test cases](docs/TEST_CASES.md) để biết validation, dữ liệu và kết quả mong đợi. Test cases ở trạng thái **Chưa chạy** cho tới khi được thực thi.

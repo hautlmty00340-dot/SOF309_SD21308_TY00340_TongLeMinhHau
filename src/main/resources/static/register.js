@@ -124,17 +124,19 @@
     </div>
   `;
 
-  function showToast() {
+  function showToast(message, title = 'Thông báo') {
     const region = document.getElementById('registerToastRegion');
     const toast = document.createElement('div');
     toast.className = 'register-toast';
     toast.innerHTML = `
       <span class="material-symbols-outlined" aria-hidden="true">info</span>
       <div>
-        <strong>Biểu mẫu hợp lệ</strong>
-        <p>Trang đăng ký chưa kết nối máy chủ; thông tin chưa được gửi hoặc lưu.</p>
+        <strong></strong>
+        <p></p>
       </div>
     `;
+    toast.querySelector('strong').textContent = title;
+    toast.querySelector('p').textContent = message;
     region.appendChild(toast);
     window.setTimeout(() => toast.remove(), 5000);
   }
@@ -228,7 +230,7 @@
       });
     });
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const isValid = [
         validateName(),
@@ -244,12 +246,31 @@
       registerSpinner.classList.add('is-visible');
       registerButtonText.textContent = 'Đang kiểm tra...';
 
-      window.setTimeout(() => {
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: fullName.value.trim(),
+            contact: contact.value.trim(),
+            password: password.value,
+            confirmPassword: confirmPassword.value,
+            acceptTerms: acceptTerms.checked
+          })
+        });
+        if (!response.ok) {
+          const problem = await response.json().catch(() => ({}));
+          throw new Error(problem.message || problem.detail || 'Không thể tạo tài khoản. Vui lòng thử lại.');
+        }
+        showToast('Tài khoản đã được tạo. Chào mừng bạn đến với ShopPulse!', 'Đăng ký thành công');
+        window.location.hash = 'home';
+      } catch (error) {
+        showToast(error.message, 'Không thể đăng ký');
+      } finally {
         registerButton.disabled = false;
         registerSpinner.classList.remove('is-visible');
         registerButtonText.textContent = 'Tạo tài khoản';
-        showToast();
-      }, 500);
+      }
     });
   }
 

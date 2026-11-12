@@ -95,8 +95,8 @@ function initializeLoginPage() {
       }
 
       function validatePassword(val) {
-        if (!val || val.length < 6) {
-          passwordErrorText.textContent = 'Mật khẩu phải chứa ít nhất 6 ký tự.';
+        if (!val || val.length < 8) {
+          passwordErrorText.textContent = 'Mật khẩu phải chứa ít nhất 8 ký tự.';
           passwordError.classList.remove('hidden');
           passwordError.classList.add('flex');
           passwordInput.classList.add('ring-error');
@@ -122,7 +122,7 @@ function initializeLoginPage() {
       });
 
       // Login form submission
-      loginForm.addEventListener('submit', (e) => {
+      loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         const isIdentValid = validateIdentifier(identifierInput.value);
@@ -137,13 +137,25 @@ function initializeLoginPage() {
         submitSpinner.classList.remove('hidden');
         submitBtnText.textContent = 'Đang xác thực...';
 
-        setTimeout(() => {
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: identifierInput.value.trim(), password: passwordInput.value })
+          });
+          if (!response.ok) {
+            const problem = await response.json().catch(() => ({}));
+            throw new Error(problem.message || problem.detail || 'Thông tin đăng nhập không chính xác.');
+          }
+          showToast('Đăng nhập thành công!', 'Đang chuyển hướng đến ShopPulse.');
+          window.location.hash = 'home';
+        } catch (error) {
+          showToast('Không thể đăng nhập', error.message, false);
+        } finally {
           submitBtn.disabled = false;
           submitSpinner.classList.add('hidden');
           submitBtnText.textContent = 'Đăng nhập';
-
-          showToast('Đăng nhập thành công!', 'Đang chuyển hướng đến ShopPulse...');
-        }, 1200);
+        }
       });
 
       // Modal Controls
