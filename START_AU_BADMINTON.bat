@@ -3,9 +3,28 @@ setlocal EnableExtensions
 cd /d "%~dp0"
 
 echo AU Badminton - SOF309
+if not defined DB_AUTH_MODE set "DB_AUTH_MODE=auto"
+set "SQL_AUTH_DIR=%~dp0target\auth"
+set "SQL_AUTH_DLL=%SQL_AUTH_DIR%\mssql-jdbc_auth-12.4.2.x64.dll"
 if not defined DB_URL set "DB_URL=jdbc:sqlserver://localhost;databaseName=AuDB;encrypt=false;trustServerCertificate=true"
+if /i "%DB_AUTH_MODE%"=="windows" set "DB_URL=jdbc:sqlserver://localhost;databaseName=AuDB;encrypt=false;trustServerCertificate=true;integratedSecurity=true;authenticationScheme=NativeAuthentication"
+if /i "%DB_AUTH_MODE%"=="auto" if exist "%SQL_AUTH_DLL%" (
+  set "DB_AUTH_MODE=windows"
+  set "DB_URL=jdbc:sqlserver://localhost;databaseName=AuDB;encrypt=false;trustServerCertificate=true;integratedSecurity=true;authenticationScheme=NativeAuthentication"
+)
 if not defined DB_USER set "DB_USER=sa"
-if not defined DB_PASSWORD echo [INFO] DB_PASSWORD is not set. Set it before launching if SQL Server requires a password.
+if /i "%DB_AUTH_MODE%"=="windows" (
+  if not exist "%SQL_AUTH_DLL%" (
+    echo [ERROR] Windows Authentication DLL is missing: %SQL_AUTH_DLL%
+    echo Copy mssql-jdbc_auth-12.4.2.x64.dll to target\auth or set DB_AUTH_MODE=sql.
+    pause
+    exit /b 1
+  )
+  set "PATH=%SQL_AUTH_DIR%;%PATH%"
+  set "DB_PASSWORD="
+) else if not defined DB_PASSWORD (
+  echo [INFO] DB_PASSWORD is not set. Set it before launching if SQL Server requires a password.
+)
 
 set "MAVEN_CMD="
 for /f "delims=" %%M in ('where mvn.cmd 2^>nul') do if not defined MAVEN_CMD set "MAVEN_CMD=%%M"

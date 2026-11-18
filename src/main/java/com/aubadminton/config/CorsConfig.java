@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.springframework.http.CacheControl;
 
@@ -65,16 +64,12 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
-        Path project = Paths.get(System.getProperty("user.dir")).toAbsolutePath().normalize();
-        if (project.getFileName() != null && project.getFileName().toString().equalsIgnoreCase("java-backend"))
-            project = project.getParent();
-        String webRoot = project.toUri().toString();
         registry.addResourceHandler("/assets/**")
-                .addResourceLocations(webRoot + "assets/").setCacheControl(CacheControl.noStore());
+                .addResourceLocations("classpath:/static/assets/").setCacheControl(CacheControl.noStore());
         registry.addResourceHandler("/admin/**")
-                .addResourceLocations(webRoot + "admin/").setCacheControl(CacheControl.noStore());
+                .addResourceLocations("classpath:/static/admin/").setCacheControl(CacheControl.noStore());
         registry.addResourceHandler("/*.html")
-                .addResourceLocations(webRoot).setCacheControl(CacheControl.noStore());
+                .addResourceLocations("classpath:/static/").setCacheControl(CacheControl.noStore());
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(Paths.get(System.getProperty("user.dir"), "uploads").toUri().toString())
                 .setCacheControl(CacheControl.noStore());

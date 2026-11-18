@@ -7,13 +7,16 @@
 Yêu cầu: JDK 17, Maven 3.8+, Microsoft SQL Server đang chạy.
 
 1. Mở SQL Server Management Studio và chạy toàn bộ script [`docs/database/migration_booking_detail.sql`](docs/database/migration_booking_detail.sql). Script tạo database `AuDB`, các bảng cơ bản và dữ liệu demo nếu bảng đang trống. Không chạy script lặp lại trên dữ liệu quan trọng nếu bạn chưa sao lưu.
-2. Từ thư mục gốc repo, cấu hình thông tin SQL Server qua biến môi trường (nếu không dùng `sa`):
+2. Nếu dùng SQL Server Authentication, cấu hình thông tin kết nối trong PowerShell (thay mật khẩu bằng mật khẩu SQL Server của bạn):
 
    ```powershell
+   $env:DB_AUTH_MODE = 'sql'
    $env:DB_URL = 'jdbc:sqlserver://localhost;databaseName=AuDB;encrypt=false;trustServerCertificate=true'
    $env:DB_USER = 'sa'
    $env:DB_PASSWORD = 'mat-khau-SQL-Server'
    ```
+
+   `START_AU_BADMINTON.bat` mặc định tự chọn Windows Authentication nếu file `target/auth/mssql-jdbc_auth-12.4.2.x64.dll` có sẵn; nếu không, script dùng SQL Authentication. Đặt `DB_AUTH_MODE=windows` để yêu cầu Windows Authentication rõ ràng. Không commit mật khẩu thật vào repo.
 
 3. Khởi động ứng dụng:
 
