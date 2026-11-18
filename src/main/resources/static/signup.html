@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng Ký — AU Badminton</title>
+  <link href="assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/fontawesome.min.css?v=2.8.0"/>
+  <link rel="stylesheet" href="assets/css/style.css?v=2.8.0"/>
+  <style>
+    .password-toggle { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--gray-400); cursor: pointer; font-size: 0.9rem; transition: color 0.2s; }
+    .password-toggle:hover { color: var(--primary); }
+    .form-error { font-size: 0.78rem; color: var(--danger); margin-top: 0.35rem; display: none; }
+    .au-input.error { border-color: var(--danger); }
+    .floating-courts { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; gap: 1rem; z-index: 2; }
+    .floating-chip { background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 0.75rem; font-weight: 500; padding: 0.4em 0.9em; border-radius: 99px; display: flex; align-items: center; gap: 5px; }
+    .floating-chip .dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; }
+
+    .phone-group { display: flex; border: 1.5px solid var(--gray-200); border-radius: var(--radius-md); overflow: hidden; transition: var(--transition); background: white; }
+    .phone-group:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+    .phone-group.error { border-color: var(--danger); }
+    .phone-group select { border: none; background: var(--gray-50); padding: 0 0.75rem; font-weight: 600; color: var(--gray-700); outline: none; cursor: pointer; border-right: 1px solid var(--gray-200); font-size: 0.9rem; }
+    .phone-group .input-icon-wrap { flex: 1; }
+    .phone-group .au-input { border: none !important; border-radius: 0; box-shadow: none !important; background: transparent; }
+
+    /* Authentication screen colors are scoped to these pages. */
+    .login-page {
+      --auth-card-bg: #ffffff;
+      --auth-title: #122033;
+      --auth-label: #415269;
+      --auth-muted: #62748a;
+      --auth-field-bg: #f7f9fc;
+      --auth-field-text: #1b2b40;
+      --auth-field-border: #d7e0ec;
+      --auth-placeholder: #718199;
+      --auth-line: #d8e1eb;
+      --auth-select-bg: #eef3f9;
+      min-height: 100vh;
+      height: auto;
+      padding: 3rem 1rem 7rem;
+      overflow: clip;
+    }
+    :root[data-theme="dark"] .login-page {
+      --auth-card-bg: #151e2c;
+      --auth-title: #f4f7fb;
+      --auth-label: #d0deec;
+      --auth-muted: #adbed1;
+      --auth-field-bg: #101827;
+      --auth-field-text: #f5f8fc;
+      --auth-field-border: #35455d;
+      --auth-placeholder: #9dacc0;
+      --auth-line: #34455c;
+      --auth-select-bg: #1b293c;
+    }
+    .login-page .login-card {
+      background: var(--auth-card-bg);
+      color: var(--auth-title);
+      border: 1px solid var(--auth-field-border);
+    }
+    .login-page .login-card h1 { color: var(--auth-title) !important; }
+    .login-page .login-card .au-label,
+    .login-page .login-card .au-checkbox { color: var(--auth-label) !important; }
+    .login-page .login-card .au-input {
+      color: var(--auth-field-text) !important;
+      background: var(--auth-field-bg) !important;
+      border-color: var(--auth-field-border) !important;
+    }
+    .login-page .login-card .au-input::placeholder {
+      color: var(--auth-placeholder) !important;
+      opacity: 1;
+    }
+    .login-page .login-card .au-input:focus {
+      border-color: #22c55e !important;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .22) !important;
+    }
+    .login-page .login-card .input-icon,
+    .login-page .login-card .password-toggle { color: var(--auth-muted); }
+    .login-page .login-card .login-divider { color: var(--auth-muted); }
+    .login-page .login-card .login-divider::before,
+    .login-page .login-card .login-divider::after { background: var(--auth-line); }
+    .login-page .login-card .phone-group {
+      background: var(--auth-field-bg);
+      border-color: var(--auth-field-border);
+    }
+    .login-page .login-card .phone-group:focus-within {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .22);
+    }
+    .login-page .login-card .phone-group select {
+      color: var(--auth-field-text) !important;
+      background: var(--auth-select-bg) !important;
+      border-right-color: var(--auth-field-border);
+    }
+    .login-page .login-card .phone-group .au-input {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .login-page .floating-courts {
+      bottom: 1.4rem;
+      width: max-content;
+      max-width: calc(100% - 2rem);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    @media (max-width: 600px) {
+      .login-page { padding: 1.5rem .85rem 8.5rem; }
+      .login-page .login-card { width: 100%; padding: 2rem 1.3rem; }
+      .login-page .floating-courts { gap: .4rem; }
+      .login-page .floating-chip { font-size: .68rem; }
+    }
+  </style>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+</head>
+<body>
+<div class="login-page">
+  <div class="floating-courts">
+    <div class="floating-chip"><div class="dot"></div> 6 sân sẵn sàng phục vụ</div>
+    <div class="floating-chip">🏸 Đặt sân chỉ 30 giây</div>
+    <div class="floating-chip">💳 Thanh toán linh hoạt</div>
+  </div>
+
+  <div class="login-card anim-fadeup">
+    <div class="text-center mb-4">
+      <div class="login-logo">🏸</div>
+      <h1 style="font-size:1.5rem;font-weight:800;color:var(--auth-title);margin-bottom:0.25rem;">AU Badminton</h1>
+      <p style="color:var(--auth-muted);font-size:0.85rem;">Đăng ký tài khoản mới</p>
+    </div>
+
+    <form id="signupForm" novalidate>
+      <div class="au-form-group">
+        <label class="au-label" for="fullname">Họ và tên</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-address-card input-icon"></i>
+          <input type="text" class="au-input" id="fullname" name="fullname" placeholder="Nhập họ và tên..." required/>
+        </div>
+        <div class="form-error" id="err-fullname">Vui lòng nhập họ và tên.</div>
+      </div>
+
+      <div class="au-form-group">
+        <label class="au-label" for="username">Tên đăng nhập</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-user input-icon"></i>
+          <input type="text" class="au-input" id="username" name="username" placeholder="Nhập tên đăng nhập..." autocomplete="username" required/>
+        </div>
+        <div class="form-error" id="err-username">Vui lòng nhập tên đăng nhập.</div>
+      </div>
+
+      <div class="au-form-group">
+        <label class="au-label" for="phone">Số điện thoại</label>
+        <div class="phone-group" id="phoneGroup">
+          <select id="countryCode">
+            <option value="VN" data-dial="+84">🇻🇳 +84</option>
+            <option value="US" data-dial="+1">🇺🇸 +1</option>
+            <option value="GB" data-dial="+44">🇬🇧 +44</option>
+            <option value="KR" data-dial="+82">🇰🇷 +82</option>
+            <option value="JP" data-dial="+81">🇯🇵 +81</option>
+            <option value="CN" data-dial="+86">🇨🇳 +86</option>
+            <option value="SG" data-dial="+65">🇸🇬 +65</option>
+            <option value="TH" data-dial="+66">🇹🇭 +66</option>
+            <option value="AU" data-dial="+61">🇦🇺 +61</option>
+            <option value="TW" data-dial="+886">🇹🇼 +886</option>
+          </select>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-phone input-icon"></i>
+            <input type="tel" class="au-input" id="phone" name="phone" placeholder="Nhập các số còn lại..." required/>
+          </div>
+        </div>
+        <div class="form-error" id="err-phone">Vui lòng nhập số điện thoại.</div>
+      </div>
+
+      <div class="au-form-group">
+        <label class="au-label" for="password">Mật khẩu</label>
+        <div class="input-icon-wrap" style="position:relative;">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" class="au-input" id="password" name="password" minlength="8" placeholder="Nhập mật khẩu..." autocomplete="new-password" required style="padding-right:2.8rem;"/>
+          <span class="password-toggle" id="togglePassword"><i class="fa-regular fa-eye" id="eyeIcon"></i></span>
+        </div>
+        <div class="form-error" id="err-password">Vui lòng nhập mật khẩu.</div>
+      </div>
+
+      <div class="au-form-group">
+        <label class="au-label" for="confirmPassword">Xác nhận mật khẩu</label>
+        <div class="input-icon-wrap" style="position:relative;">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" class="au-input" id="confirmPassword" name="confirmPassword" minlength="8" placeholder="Nhập lại mật khẩu..." autocomplete="new-password" required style="padding-right:2.8rem;"/>
+          <span class="password-toggle" id="toggleConfirmPassword"><i class="fa-regular fa-eye" id="eyeIconConfirm"></i></span>
+        </div>
+        <div class="form-error" id="err-confirmPassword">Mật khẩu không khớp.</div>
+      </div>
+
+      <button type="submit" class="btn-au-primary w-100 mt-2" id="signupBtn" style="width:100%;padding:0.85rem;">
+        <i class="fa-solid fa-user-plus me-2"></i>Đăng Ký
+      </button>
+
+      <div class="login-divider">hoặc</div>
+
+      <div style="text-align:center;font-size:0.85rem;color:var(--gray-400);">
+        Đã có tài khoản? <a href="login.html" style="color:var(--primary);font-weight:600;text-decoration:none;"> Đăng nhập</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.getElementById('togglePassword').addEventListener('click', function() {
+    const pw = document.getElementById('password'); const icon = document.getElementById('eyeIcon');
+    if (pw.type === 'password') { pw.type = 'text'; icon.className = 'fa-regular fa-eye-slash'; } 
+    else { pw.type = 'password'; icon.className = 'fa-regular fa-eye'; }
+  });
+
+  document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+    const pw = document.getElementById('confirmPassword'); const icon = document.getElementById('eyeIconConfirm');
+    if (pw.type === 'password') { pw.type = 'text'; icon.className = 'fa-regular fa-eye-slash'; } 
+    else { pw.type = 'password'; icon.className = 'fa-regular fa-eye'; }
+  });
+
+  document.getElementById('signupForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const fullname = document.getElementById('fullname').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const countrySelect = document.getElementById('countryCode');
+    const countryCode = countrySelect.value;
+    let valid = true; let finalPhone = phone;
+
+    ['fullname', 'username', 'password', 'confirmPassword'].forEach(id => {
+      document.getElementById('err-' + id).style.display = 'none';
+      document.getElementById(id).classList.remove('error');
+    });
+    document.getElementById('err-phone').style.display = 'none';
+    document.getElementById('phoneGroup').classList.remove('error');
+
+    if (!fullname) { document.getElementById('fullname').classList.add('error'); document.getElementById('err-fullname').style.display = 'block'; valid = false; }
+    if (!username) { document.getElementById('username').classList.add('error'); document.getElementById('err-username').style.display = 'block'; valid = false; }
+    
+    if (!phone) { 
+      document.getElementById('phoneGroup').classList.add('error'); 
+      document.getElementById('err-phone').textContent = 'Vui lòng nhập số điện thoại.';
+      document.getElementById('err-phone').style.display = 'block'; valid = false; 
+    } else {
+      if (countryCode === 'VN') {
+        let checkPhone = phone;
+        if (checkPhone.startsWith('0')) { checkPhone = checkPhone.substring(1); }
+        const vnPhoneRegex = /^[35789]\d{8}$/;
+        if (!vnPhoneRegex.test(checkPhone)) {
+          document.getElementById('phoneGroup').classList.add('error');
+          const errPhone = document.getElementById('err-phone');
+          errPhone.textContent = '❌ SĐT Việt Nam không hợp lệ (Phải gồm 9 chữ số sau đầu +84, bắt đầu bằng mạng 3,5,7,8,9).';
+          errPhone.style.display = 'block'; valid = false;
+        } else { finalPhone = '0' + checkPhone; }
+      } else {
+        const globalPhoneRegex = /^\d{7,15}$/;
+        if (!globalPhoneRegex.test(phone)) {
+          document.getElementById('phoneGroup').classList.add('error');
+          const errPhone = document.getElementById('err-phone');
+          errPhone.textContent = '❌ Số điện thoại quốc tế không hợp lệ.';
+          errPhone.style.display = 'block'; valid = false;
+        } else {
+          const dialCode = countrySelect.options[countrySelect.selectedIndex].getAttribute('data-dial');
+          finalPhone = dialCode + phone;
+        }
+      }
+    }
+
+    if (password.length < 8) { const input=document.getElementById('password');input.classList.add('error');document.getElementById('err-password').textContent='Mật khẩu cần ít nhất 8 ký tự.';document.getElementById('err-password').style.display = 'block'; valid = false; }
+    if (password !== confirmPassword) { document.getElementById('confirmPassword').classList.add('error'); document.getElementById('err-confirmPassword').style.display = 'block'; valid = false; }
+    if (!valid) return;
+
+    const btn = document.getElementById('signupBtn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang xử lý...'; btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullname, username, phone: finalPhone, password }),
+        signal: AbortSignal.timeout(12000)
+      });
+      const data = await res.json();
+      if (data.success) {
+        showSuccess('Đăng ký thành công! Đang chuyển hướng...');
+        setTimeout(() => { window.location.href = 'login.html'; }, 1500);
+      } else { throw new Error(data.message || 'Lỗi khi đăng ký'); }
+    } catch (err) {
+      showError(err.message || 'Lỗi kết nối máy chủ');
+      btn.innerHTML = '<i class="fa-solid fa-user-plus me-2"></i>Đăng Ký'; btn.disabled = false;
+    }
+  });
+
+  function showError(msg) {
+    let errDiv = document.getElementById('signup-msg-global');
+    if (!errDiv) { errDiv = document.createElement('div'); errDiv.id = 'signup-msg-global'; document.getElementById('signupBtn').parentNode.insertBefore(errDiv, document.getElementById('signupBtn')); }
+    errDiv.style.cssText = 'background:#FEE2E2;border:1px solid #FCA5A5;border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;color:#B91C1C;margin-bottom:1rem;text-align:center;';
+    errDiv.textContent = '❌ ' + msg;
+  }
+  function showSuccess(msg) {
+    let errDiv = document.getElementById('signup-msg-global');
+    if (!errDiv) { errDiv = document.createElement('div'); errDiv.id = 'signup-msg-global'; document.getElementById('signupBtn').parentNode.insertBefore(errDiv, document.getElementById('signupBtn')); }
+    errDiv.style.cssText = 'background:#D1FAE5;border:1px solid #6EE7B7;border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;color:#047857;margin-bottom:1rem;text-align:center;';
+    errDiv.textContent = '✅ ' + msg;
+  }
+</script>
+<script src="assets/js/site-ui.js?v=2.8.0" defer></script>
+</body>
+</html>

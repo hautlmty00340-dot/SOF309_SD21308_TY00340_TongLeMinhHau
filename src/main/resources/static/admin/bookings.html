@@ -1,0 +1,763 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <script>
+      if (["5500", "5501"].includes(location.port)) {
+        location.replace(
+          "http://localhost:8080" + location.pathname + location.search + location.hash,
+        );
+      }
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Đặt Sân — Admin AU Badminton</title>
+    <link href="../assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/fontawesome.min.css?v=2.8.0" />
+    <link rel="stylesheet" href="../assets/css/style.css?v=2.8.0" />
+    <style>
+      body {
+        background: var(--gray-50);
+      }
+      .stat-mini {
+        background: var(--white);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-200);
+        padding: 0.85rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 140px;
+      }
+      .stat-mini .num {
+        font-size: 1.5rem;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .stat-mini .lbl {
+        font-size: 0.72rem;
+        color: var(--gray-400);
+        margin-top: 0.1rem;
+      }
+      .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .admin-table th {
+        padding: 0.75rem 1rem;
+        background: var(--gray-50);
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--gray-400);
+        text-transform: uppercase;
+        border-bottom: 2px solid var(--gray-200);
+        text-align: left;
+      }
+      .admin-table td {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 0.85rem;
+        vertical-align: middle;
+      }
+      .admin-table tr:hover td {
+        background: var(--gray-50);
+      }
+      .badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 0.3em 0.8em;
+        border-radius: 99px;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+      .badge-pending {
+        background: rgba(245, 158, 11, 0.12);
+        color: #b45309;
+      }
+      .badge-confirmed {
+        background: rgba(34, 197, 94, 0.12);
+        color: #15803d;
+      }
+      .badge-cancelled {
+        background: rgba(239, 68, 68, 0.12);
+        color: #b91c1c;
+      }
+      .tab-pill {
+        padding: 0.45rem 1rem;
+        border-radius: 99px;
+        border: 1.5px solid var(--gray-200);
+        background: var(--white);
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .tab-pill.active {
+        border-color: var(--primary);
+        background: var(--primary-light);
+        color: var(--primary-dark);
+      }
+      .btn-confirm {
+        background: rgba(34, 197, 94, 0.1);
+        color: #15803d;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+        border-radius: 6px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .btn-cancel {
+        background: rgba(239, 68, 68, 0.1);
+        color: #b91c1c;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 6px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
+    <script>
+      function escHtml(value) {
+        return String(value ?? "").replace(
+          /[&<>"']/g,
+          (char) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[char],
+        );
+      }
+    </script>
+    <script>
+      document.documentElement.dataset.theme =
+        localStorage.getItem("au_theme") === "dark" ? "dark" : "light";
+    </script>
+  </head>
+  <body class="admin-locked">
+    <div class="admin-layout">
+      <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng quản trị">
+        <div class="sidebar-header">
+          <a href="dashboard.html" class="sidebar-logo" style="text-decoration: none"
+            ><div class="sidebar-logo-icon">🏸</div>
+            <div>
+              <div class="sidebar-logo-text">AU Badminton</div>
+              <div class="sidebar-logo-sub">QUẢN TRỊ VẬN HÀNH</div>
+            </div></a
+          >
+        </div>
+        <div class="sidebar-section-label">Tổng quan</div>
+        <a href="dashboard.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span
+          ><span>Tổng quan</span></a
+        >
+        <div class="sidebar-section-label">Quản lý</div>
+        <a href="courts.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></span
+          ><span>Quản lý sân</span></a
+        >
+        <a href="bookings.html" class="sidebar-nav-item active"
+          ><span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span
+          ><span>Quản lý đặt sân</span></a
+        >
+        <a href="customers.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Khách hàng</span></a
+        >
+        <div class="sidebar-section-label">IoT &amp; Hệ thống</div>
+        <a href="iot.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span
+          ><span>Điều khiển đèn</span></a
+        >
+        <a href="report.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span
+          ><span>Báo cáo doanh thu</span></a
+        >
+        <a href="settings.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Cài đặt</span></a
+        >
+        <div class="sidebar-footer">
+          <div class="sidebar-user">
+            <span class="au-avatar">A</span>
+            <div><strong>AU Workspace</strong><small>Quản trị viên</small></div>
+          </div>
+          <a href="../account.html" class="sidebar-nav-item"
+            ><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span
+            ><span>Hồ sơ của tôi</span></a
+          >
+          <a href="../login.html" class="sidebar-nav-item sidebar-logout"
+            ><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span
+            ><span>Đăng xuất</span></a
+          >
+        </div>
+      </aside>
+
+      <div class="admin-content">
+        <div class="admin-topbar">
+          <div><h2>Quản Lý Đặt Sân</h2></div>
+        </div>
+        <div class="admin-main">
+          <div class="d-flex gap-3 mb-4 flex-wrap">
+            <div class="stat-mini">
+              <div
+                style="
+                  width: 36px;
+                  height: 36px;
+                  border-radius: var(--radius-sm);
+                  background: var(--gray-100);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: var(--gray-500);
+                "
+              >
+                <i class="fa-solid fa-calendar-days"></i>
+              </div>
+              <div>
+                <div class="num" id="statTotal">—</div>
+                <div class="lbl">Tổng Tháng Này</div>
+              </div>
+            </div>
+            <div class="stat-mini">
+              <div
+                style="
+                  width: 36px;
+                  height: 36px;
+                  border-radius: var(--radius-sm);
+                  background: #fef9c3;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: #b45309;
+                "
+              >
+                <i class="fa-solid fa-clock"></i>
+              </div>
+              <div>
+                <div class="num" id="statPending" style="color: #b45309">—</div>
+                <div class="lbl">Chờ Duyệt</div>
+              </div>
+            </div>
+            <div class="stat-mini">
+              <div
+                style="
+                  width: 36px;
+                  height: 36px;
+                  border-radius: var(--radius-sm);
+                  background: rgba(34, 197, 94, 0.12);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: var(--primary);
+                "
+              >
+                <i class="fa-solid fa-check-circle"></i>
+              </div>
+              <div>
+                <div class="num" id="statConfirmed" style="color: var(--primary)">—</div>
+                <div class="lbl">Đã Xác Nhận</div>
+              </div>
+            </div>
+            <div class="stat-mini">
+              <div
+                style="
+                  width: 36px;
+                  height: 36px;
+                  border-radius: var(--radius-sm);
+                  background: rgba(239, 68, 68, 0.1);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: var(--danger);
+                "
+              >
+                <i class="fa-solid fa-ban"></i>
+              </div>
+              <div>
+                <div class="num" id="statCancelled" style="color: var(--danger)">—</div>
+                <div class="lbl">Đã Hủy</div>
+              </div>
+            </div>
+          </div>
+          <div class="au-card">
+            <div style="overflow-x: auto">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px; text-align: center">STT</th>
+                    <th>Mã ĐS</th>
+                    <th>Khách Hàng</th>
+                    <th>Sân</th>
+                    <th>Ngày</th>
+                    <th>Giờ</th>
+                    <th>Thanh Toán</th>
+                    <th>Tổng Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th style="text-align: center">Thao Tác</th>
+                  </tr>
+                </thead>
+                <tbody id="bookingTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bd-overlay" id="bdOverlay">
+      <div class="bd-modal" id="bdModal">
+        <div class="bd-header">
+          <div class="bd-header-left">
+            <div class="bd-title">
+              <span>📋 ĐƠN ĐẶT SÂN CẦU LÔNG</span>
+              <span class="bd-booking-id" id="bdBookingId">#BK-00000</span>
+            </div>
+            <div id="bdStatusBadge"></div>
+          </div>
+          <button class="bd-close" onclick="closeDetailModal()" title="Đóng">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="bd-body">
+          <div class="bd-section">
+            <div class="bd-section-title"><i class="fa-solid fa-user"></i> Thông Tin Người Đặt</div>
+            <div class="bd-info-grid">
+              <div class="bd-info-item">
+                <span class="bd-info-label">Họ Tên</span>
+                <span class="bd-info-value" id="bdCustomerName">—</span>
+              </div>
+              <div class="bd-info-item">
+                <span class="bd-info-label">Số Điện Thoại</span>
+                <span class="bd-info-value" id="bdCustomerPhone">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bd-section">
+            <div class="bd-section-title">
+              <i class="fa-solid fa-table-tennis-paddle-ball"></i> Thông Tin Sân
+            </div>
+            <div class="bd-info-grid">
+              <div class="bd-info-item">
+                <span class="bd-info-label">Tên Sân</span>
+                <span class="bd-info-value" id="bdCourtName">—</span>
+              </div>
+              <div class="bd-info-item">
+                <span class="bd-info-label">Loại Sân</span>
+                <span class="bd-info-value" id="bdCourtType">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bd-section">
+            <div class="bd-section-title">
+              <i class="fa-solid fa-calendar-days"></i> Thời Gian Chơi
+            </div>
+            <div class="bd-info-grid">
+              <div class="bd-info-item">
+                <span class="bd-info-label">Ngày Chơi</span>
+                <span class="bd-info-value" id="bdPlayDate">—</span>
+              </div>
+              <div class="bd-info-item">
+                <span class="bd-info-label">Giờ Chơi</span>
+                <span class="bd-info-value" id="bdPlayTime">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bd-section payment-section">
+            <div class="bd-section-title">
+              <i class="fa-solid fa-money-bill-wave"></i> Thanh Toán
+            </div>
+            <div class="bd-info-grid">
+              <div class="bd-info-item">
+                <span class="bd-info-label">Phương Thức</span>
+                <span class="bd-info-value" id="bdPaymentMethod">—</span>
+              </div>
+              <div class="bd-info-item">
+                <span class="bd-info-label">Tổng Tiền</span>
+                <span class="bd-info-value highlight" id="bdTotalAmount">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bd-section deposit-section">
+            <div class="bd-section-title">
+              <i class="fa-solid fa-receipt"></i> Xác Nhận Tiền Cọc
+            </div>
+            <div
+              class="bd-deposit-area"
+              id="bdDepositArea"
+              onclick="document.getElementById('depositFileInput').click()"
+            >
+              <div class="bd-deposit-placeholder" id="bdDepositPlaceholder">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Bấm để tải ảnh chuyển khoản</span>
+                <small>PNG, JPG — Tối đa 10MB</small>
+              </div>
+              <img id="bdDepositImg" style="display: none" alt="Ảnh xác nhận tiền cọc" />
+            </div>
+            <input
+              type="file"
+              id="depositFileInput"
+              accept="image/*"
+              style="display: none"
+              onchange="handleDepositUpload(this)"
+            />
+          </div>
+
+          <div class="bd-section notes-section">
+            <div class="bd-section-title">
+              <i class="fa-solid fa-pen-to-square"></i> Ghi Chú Admin
+            </div>
+            <textarea
+              class="bd-notes-textarea"
+              id="bdAdminNotes"
+              placeholder="Ghi chú riêng cho đơn này (ví dụ: Khách VIP, Đã gọi xác nhận, v.v.)"
+            ></textarea>
+            <button class="bd-notes-save" onclick="saveAdminNotes()">
+              <i class="fa-solid fa-floppy-disk"></i> Lưu Ghi Chú
+            </button>
+          </div>
+        </div>
+
+        <div class="bd-footer">
+          <div class="bd-footer-left">
+            <i class="fa-regular fa-clock"></i>
+            <span id="bdCreatedAt">—</span>
+          </div>
+          <div class="bd-footer-actions" id="bdFooterActions">
+            <button class="bd-btn bd-btn-print" onclick="printBookingDetail()">
+              <i class="fa-solid fa-print"></i> In Phiếu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const API = "/api";
+      let currentBookingId = null;
+
+      async function loadBookings() {
+        try {
+          const res = await fetch(`${API}/bookings`);
+          const data = await res.json();
+          if (data.success) {
+            document.getElementById("bookingTbody").innerHTML = data.data
+              .map((b, index) => {
+                let payIcon = "📱 QR";
+                if (b.payment_method === "VNPAY") payIcon = "💳 VNPay";
+                if (b.payment_method === "MOMO") payIcon = "🩷 MoMo";
+                if (b.payment_method === "CASH") payIcon = "💵 Tiền Mặt";
+                const statusBadge =
+                  {
+                    PENDING: '<span class="badge-status badge-pending">Chờ Duyệt</span>',
+                    CONFIRMED: '<span class="badge-status badge-confirmed">Xác Nhận</span>',
+                    CANCELLED: '<span class="badge-status badge-cancelled">Đã Hủy</span>',
+                  }[b.status] || b.status;
+
+                let actions = `<button class="btn-view-detail" onclick="openDetailModal(${b.booking_id})" title="Xem chi tiết"><i class="fa-solid fa-eye"></i> Xem</button>`;
+                if (b.status === "PENDING") {
+                  actions += ` <button class="btn-confirm" onclick="confirmBooking(${b.booking_id})">Duyệt</button> <button class="btn-cancel" onclick="cancel(${b.booking_id})">Hủy</button>`;
+                } else if (b.status === "CONFIRMED") {
+                  actions += ` <button class="btn-cancel" onclick="cancel(${b.booking_id})">Hủy</button>`;
+                }
+
+                return `<tr>
+          <td style="text-align:center;">${index + 1}</td>
+          <td><strong style="color:var(--primary);">#BK-${String(b.booking_id).padStart(5, "0")}</strong></td>
+          <td><div style="font-weight:600;">${escHtml(b.customer_name)}</div><div style="font-size:0.75rem;color:var(--gray-400);">${escHtml(b.customer_phone)}</div></td>
+          <td>${escHtml(b.court_name)}</td>
+          <td>${b.date}</td>
+          <td>${b.start_time.substring(0, 5)}–${b.end_time.substring(0, 5)}</td>
+          <td>${payIcon}</td>
+          <td style="font-weight:700;color:var(--primary);">${Number(b.grand_total || b.court_amount).toLocaleString("vi-VN")}đ</td>
+          <td>${statusBadge}</td>
+          <td style="text-align:center;"><div class="d-flex gap-1 justify-content-center flex-wrap">${actions}</div></td>
+        </tr>`;
+              })
+              .join("");
+            updateStats(data.data);
+          }
+        } catch (err) {}
+      }
+
+      async function confirmBooking(id) {
+        try {
+          const res = await fetch(`${API}/bookings/${id}/status`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "CONFIRMED" }),
+          });
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            alert("Không thể duyệt đơn: " + (data.message || "Lỗi API"));
+            return;
+          }
+          loadBookings();
+
+          if (currentBookingId === id) openDetailModal(id);
+        } catch (err) {}
+      }
+
+      async function cancel(id) {
+        if (!confirm("Xác nhận hủy đơn này?")) return;
+        try {
+          const res = await fetch(`${API}/bookings/${id}/status`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "CANCELLED" }),
+          });
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            alert("Không thể hủy đơn: " + (data.message || "Lỗi API"));
+            return;
+          }
+          loadBookings();
+          if (currentBookingId === id) openDetailModal(id);
+        } catch (err) {}
+      }
+
+      function updateStats(bookings) {
+        const now = new Date();
+        const thisMonth = bookings.filter((b) => {
+          const d = new Date(b.date);
+          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+        document.getElementById("statTotal").textContent = thisMonth.length;
+        document.getElementById("statPending").textContent = thisMonth.filter(
+          (b) => b.status === "PENDING",
+        ).length;
+        document.getElementById("statConfirmed").textContent = thisMonth.filter(
+          (b) => b.status === "CONFIRMED",
+        ).length;
+        document.getElementById("statCancelled").textContent = thisMonth.filter(
+          (b) => b.status === "CANCELLED",
+        ).length;
+      }
+
+      async function openDetailModal(bookingId) {
+        currentBookingId = bookingId;
+        try {
+          const res = await fetch(`${API}/bookings/${bookingId}`);
+          const data = await res.json();
+          if (!data.success) {
+            alert("Không tìm thấy đơn #" + bookingId);
+            return;
+          }
+          const b = data.data;
+
+          document.getElementById("bdBookingId").textContent =
+            "#BK-" + String(b.booking_id).padStart(5, "0");
+
+          const statusMap = {
+            PENDING: { label: "⏳ Chờ Duyệt", cls: "bd-status-pending" },
+            CONFIRMED: { label: "✅ Đã Xác Nhận", cls: "bd-status-confirmed" },
+            CANCELLED: { label: "❌ Đã Hủy", cls: "bd-status-cancelled" },
+          };
+          const st = statusMap[b.status] || { label: b.status, cls: "bd-status-pending" };
+          document.getElementById("bdStatusBadge").innerHTML =
+            `<span class="bd-status-badge ${st.cls}">${st.label}</span>`;
+
+          document.getElementById("bdCustomerName").textContent = b.customer_name || "—";
+          document.getElementById("bdCustomerPhone").textContent =
+            formatPhone(b.customer_phone) || "—";
+
+          document.getElementById("bdCourtName").textContent = b.court_name || "—";
+          document.getElementById("bdCourtType").textContent = b.court_type || "—";
+
+          const playDate = formatVietnameseDate(b.date);
+          document.getElementById("bdPlayDate").textContent = playDate;
+
+          const startStr = b.start_time ? b.start_time.substring(0, 5) : "??";
+          const endStr = b.end_time ? b.end_time.substring(0, 5) : "??";
+          const durationHours = calcHoursBetween(b.start_time, b.end_time);
+          document.getElementById("bdPlayTime").textContent =
+            `${startStr} — ${endStr} (${durationHours} tiếng)`;
+
+          const payLabels = {
+            BANK_TRANSFER: "📱 Quét QR",
+            VNPAY: "💳 VNPay",
+            MOMO: "🩷 Ví MoMo",
+            CASH: "💵 Tiền Mặt",
+          };
+          document.getElementById("bdPaymentMethod").textContent =
+            payLabels[b.payment_method] || b.payment_method || "—";
+          document.getElementById("bdTotalAmount").textContent =
+            Number(b.grand_total || b.court_amount || 0).toLocaleString("vi-VN") + "đ";
+
+          const depositImg = document.getElementById("bdDepositImg");
+          const depositPlaceholder = document.getElementById("bdDepositPlaceholder");
+          const depositArea = document.getElementById("bdDepositArea");
+          if (b.deposit_image && b.deposit_image.length > 1) {
+            depositImg.src = API.replace("/api", "") + b.deposit_image;
+            depositImg.style.display = "block";
+            depositPlaceholder.style.display = "none";
+            depositArea.classList.add("has-image");
+          } else {
+            depositImg.style.display = "none";
+            depositPlaceholder.style.display = "flex";
+            depositArea.classList.remove("has-image");
+          }
+
+          document.getElementById("bdAdminNotes").value = b.admin_notes || "";
+
+          if (b.created_at) {
+            const created = new Date(b.created_at);
+            document.getElementById("bdCreatedAt").textContent =
+              "Tạo lúc: " + created.toLocaleString("vi-VN");
+          } else {
+            document.getElementById("bdCreatedAt").textContent = "";
+          }
+
+          let footerHtml = "";
+          if (b.status === "PENDING") {
+            footerHtml += `<button class="bd-btn bd-btn-confirm" onclick="confirmBooking(${b.booking_id})"><i class="fa-solid fa-check"></i> Duyệt Đơn</button>`;
+            footerHtml += `<button class="bd-btn bd-btn-cancel" onclick="cancel(${b.booking_id})"><i class="fa-solid fa-ban"></i> Hủy Đơn</button>`;
+          } else if (b.status === "CONFIRMED") {
+            footerHtml += `<button class="bd-btn bd-btn-cancel" onclick="cancel(${b.booking_id})"><i class="fa-solid fa-ban"></i> Hủy Đơn</button>`;
+          }
+          footerHtml += `<button class="bd-btn bd-btn-print" onclick="printBookingDetail()"><i class="fa-solid fa-print"></i> In Phiếu</button>`;
+          document.getElementById("bdFooterActions").innerHTML = footerHtml;
+
+          document.getElementById("bdOverlay").classList.add("show");
+          document.body.style.overflow = "hidden";
+        } catch (err) {
+          console.error(err);
+          alert("Lỗi khi tải chi tiết đơn: " + err.message);
+        }
+      }
+
+      function closeDetailModal() {
+        document.getElementById("bdOverlay").classList.remove("show");
+        document.body.style.overflow = "";
+        currentBookingId = null;
+      }
+
+      document.getElementById("bdOverlay").addEventListener("click", function (e) {
+        if (e.target === this) closeDetailModal();
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeDetailModal();
+      });
+
+      async function handleDepositUpload(input) {
+        if (!input.files || !input.files[0] || !currentBookingId) return;
+        const file = input.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const res = await fetch(`${API}/bookings/${currentBookingId}/deposit-image`, {
+            method: "POST",
+            body: formData,
+          });
+          const data = await res.json();
+          if (data.success) {
+            const depositImg = document.getElementById("bdDepositImg");
+            const depositPlaceholder = document.getElementById("bdDepositPlaceholder");
+            const depositArea = document.getElementById("bdDepositArea");
+            depositImg.src = API.replace("/api", "") + data.image_url;
+            depositImg.style.display = "block";
+            depositPlaceholder.style.display = "none";
+            depositArea.classList.add("has-image");
+            showToast("✅ Upload ảnh xác nhận thành công!");
+          } else {
+            showToast("❌ " + data.message, true);
+          }
+        } catch (err) {
+          showToast("❌ Lỗi upload: " + err.message, true);
+        }
+        input.value = "";
+      }
+
+      async function saveAdminNotes() {
+        if (!currentBookingId) return;
+        const notes = document.getElementById("bdAdminNotes").value;
+        try {
+          const res = await fetch(`${API}/bookings/${currentBookingId}/notes`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ admin_notes: notes }),
+          });
+          const data = await res.json();
+          if (data.success) {
+            showToast("✅ Đã lưu ghi chú!");
+          } else {
+            showToast("❌ " + data.message, true);
+          }
+        } catch (err) {
+          showToast("❌ Lỗi: " + err.message, true);
+        }
+      }
+
+      function printBookingDetail() {
+        window.print();
+      }
+
+      function formatVietnameseDate(dateStr) {
+        if (!dateStr) return "—";
+        const d = new Date(dateStr);
+        const days = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+        const dayName = days[d.getDay()];
+        return `${dayName}, ${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+      }
+
+      function formatPhone(phone) {
+        if (!phone || phone.length < 10) return phone || "—";
+        return phone.replace(/(\d{4})(\d{3})(\d{3})/, "$1.$2.$3");
+      }
+
+      function calcHoursBetween(start, end) {
+        if (!start || !end) return "?";
+        const [sh, sm] = start.split(":").map(Number);
+        const [eh, em] = end.split(":").map(Number);
+        const mins = eh * 60 + em - (sh * 60 + sm);
+        if (mins <= 0) return "?";
+        const hours = mins / 60;
+        return hours % 1 === 0 ? hours : hours.toFixed(1);
+      }
+
+      function showToast(message, isError = false) {
+        let container = document.querySelector(".au-toast-container");
+        if (!container) {
+          container = document.createElement("div");
+          container.className = "au-toast-container";
+          document.body.appendChild(container);
+        }
+        const toast = document.createElement("div");
+        toast.className = `au-toast ${isError ? "error" : "success"}`;
+        toast.innerHTML = `<span>${escHtml(message)}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transform = "translateX(120%)";
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+
+      loadBookings();
+    </script>
+
+    <script src="../assets/js/site-ui.js?v=2.8.0" defer></script>
+    <script>
+      document.querySelectorAll('a[href="../login.html"]').forEach((a) =>
+        a.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            await fetch("/api/auth/logout", { method: "POST" });
+          } catch (_) {}
+          sessionStorage.removeItem("au_user");
+          location.href = "../index.html";
+        }),
+      );
+    </script>
+  </body>
+</html>

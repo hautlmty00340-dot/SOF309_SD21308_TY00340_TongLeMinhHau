@@ -1,30 +1,14 @@
 # THƯ MỤC MINH CHỨNG SỬ DỤNG AI (Y6 - ĐIỂM A)
 
-Sinh viên lưu các file ghi chép quá trình làm việc với AI vào thư mục này. Mỗi file tương ứng với một giai đoạn:
-* `01_test_design_ai.md`: Dùng AI + RAG sinh Test Plan & Test Case.
-* `02_junit_script_ai.md`: Dùng AI hỗ trợ viết Unit Test cho Controller.
-* `03_selenium_pom_ai.md`: Dùng Cursor AI / GenAI sinh Page Object Model.
-* `04_debug_logs_ai.md`: Nhật ký đưa stack trace lỗi cho AI phân tích và sửa.
-* `05_github_actions_ai.md`: Dùng AI viết workflow CI/CD.
-* `06_code_review_ai.md`: AI review và đề xuất tối ưu mã nguồn test.
+Lưu nhật ký AI theo từng giai đoạn của ứng dụng AU Badminton:
 
----
+* `01_test_design_ai.md`: đặc tả, test plan và test cases Tuần 1.
+* `02_junit_script_ai.md`: sẽ ghi lại quá trình viết unit test JUnit cho controller/service AU Badminton ở Tuần 2.
+* `03_selenium_pom_ai.md`: sẽ ghi lại quá trình xây dựng Page Object và Selenium UI test.
+* `04_debug_logs_ai.md`: nhật ký phân tích lỗi.
+* `05_github_actions_ai.md`: cấu hình CI/CD.
+* `06_code_review_ai.md`: code review và tối ưu.
 
-### MẪU GHI CHÉP CHUẨN (CHO TỪNG FILE):
-```markdown
-# Nhật ký AI: [Tên nội dung thực hiện]
+Các bản nháp test và nhật ký JUnit cũ của ShopPulse được lưu trong `docs/legacy-shop-pulse-tests/` để tham khảo; chúng không thuộc bộ test đang chạy của AU Badminton.
 
-## 1. Ngữ cảnh & Mục tiêu
-- Cần làm gì, áp dụng cho chức năng nào?
-
-## 2. Câu lệnh đã gửi cho AI (Prompt)
-> "Nội dung prompt bạn đã gửi..."
-
-## 3. Kết quả do AI sinh ra (Raw Output)
-[Dán kết quả gốc của AI vào đây]
-
-## 4. Chỉnh sửa của Sinh viên & Lý do sửa
-- Những điểm AI làm sai hoặc thiếu: ...
-- Code / Tài liệu hoàn thiện sau khi bạn sửa: ...
-```
-
+Mỗi nhật ký mới nên ghi mục tiêu, prompt thực tế, phần đầu ra đã dùng, chỉnh sửa của sinh viên và trạng thái kiểm chứng. Không khẳng định test đã pass nếu chưa chạy.

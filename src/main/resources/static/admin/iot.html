@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Điều Khiển Đèn IoT — AU Badminton</title>
+  <link href="../assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/fontawesome.min.css?v=2.8.0"/>
+  <link rel="stylesheet" href="../assets/css/style.css?v=2.8.0"/>
+  <style>
+    body { background: var(--gray-50); }
+    .iot-card {
+      background: var(--white); border-radius: var(--radius-md); border: 1px solid var(--gray-200);
+      padding: 1.5rem; text-align: center; transition: all 0.2s;
+    }
+    .iot-card:hover { border-color: var(--primary-light); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .iot-icon { font-size: 3rem; margin-bottom: 1rem; color: var(--gray-400); }
+    .iot-icon.on { color: #F59E0B; text-shadow: 0 0 15px rgba(245,158,11,0.4); }
+    .iot-icon.auto { color: var(--primary); }
+    .iot-controls { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.25rem; }
+    .btn-iot { padding: 0.4rem 0.8rem; font-size: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); background: var(--white); cursor: pointer; transition: 0.2s; }
+    .btn-iot.active-off { background: #FEE2E2; border-color: #EF4444; color: #B91C1C; font-weight: bold; }
+    .btn-iot.active-on { background: #FEF3C7; border-color: #F59E0B; color: #B45309; font-weight: bold; }
+    .btn-iot.active-auto { background: #DBEAFE; border-color: #3B82F6; color: #1D4ED8; font-weight: bold; }
+  </style>
+<script>
+
+function escHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+}
+</script>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+</head>
+<body class="admin-locked">
+<div class="admin-layout">
+
+  
+  <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng quản trị">
+<div class="sidebar-header"><a href="dashboard.html" class="sidebar-logo" style="text-decoration:none"><div class="sidebar-logo-icon">🏸</div><div><div class="sidebar-logo-text">AU Badminton</div><div class="sidebar-logo-sub">QUẢN TRỊ VẬN HÀNH</div></div></a></div>
+<div class="sidebar-section-label">Tổng quan</div>
+<a href="dashboard.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span><span>Tổng quan</span></a>
+<div class="sidebar-section-label">Quản lý</div>
+<a href="courts.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></span><span>Quản lý sân</span></a>
+<a href="bookings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span><span>Quản lý đặt sân</span></a>
+<a href="customers.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Khách hàng</span></a>
+<div class="sidebar-section-label">IoT &amp; Hệ thống</div>
+<a href="iot.html" class="sidebar-nav-item active"><span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span><span>Điều khiển đèn</span></a>
+<a href="report.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span>Báo cáo doanh thu</span></a>
+<a href="settings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Cài đặt</span></a>
+<div class="sidebar-footer"><div class="sidebar-user"><span class="au-avatar">A</span><div><strong>AU Workspace</strong><small>Quản trị viên</small></div></div>
+<a href="../account.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span>Hồ sơ của tôi</span></a>
+<a href="../login.html" class="sidebar-nav-item sidebar-logout"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span>Đăng xuất</span></a></div>
+</aside>
+  
+
+  <div class="admin-content">
+    <div class="admin-topbar">
+      <div>
+        <h2 style="font-size:1.1rem;font-weight:700;color:var(--gray-900);margin:0;">Điều Khiển Đèn IoT</h2>
+        <p style="font-size:0.78rem;color:var(--gray-400);margin:0;">Hệ thống đèn tự động bằng IoT</p>
+      </div>
+    </div>
+
+    <div class="admin-main">
+      <p class="admin-hint mb-3"><i class="fa-solid fa-circle-info"></i> Trạng thái đèn đang được mô phỏng và lưu trong hệ thống. Để điều khiển đèn thật cần tích hợp bộ điều khiển IoT.</p><div class="row g-4" id="iotGrid">
+        <div class="col-12 text-center text-muted"><i class="fa-solid fa-spinner fa-spin"></i> Đang tải danh sách sân...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="au-toast-container" id="toastContainer"></div>
+<script>
+const API = '/api';
+
+async function loadIotCourts() {
+  try {
+    const res = await fetch(`${API}/courts`);
+    const data = await res.json();
+    if(data.success) {
+      const grid = document.getElementById('iotGrid');
+      grid.innerHTML = data.data.map(court => {
+        const s = court.iot_light_status;
+        const iconClass = s === 1 ? 'on' : (s === 2 ? 'auto' : '');
+        const iconName = s === 2 ? 'fa-solid fa-robot' : 'fa-solid fa-lightbulb';
+        
+        return `
+          <div class="col-md-4 col-sm-6">
+            <div class="iot-card">
+              <h5 style="font-weight:700;">${escHtml(court.name)}</h5>
+              <p style="font-size:0.8rem;color:var(--gray-400);">${escHtml(court.court_type)}</p>
+              <div class="iot-icon ${iconClass}">
+                <i class="${iconName}"></i>
+              </div>
+              <div style="font-size:0.85rem;font-weight:600;">
+                Trạng thái: ${s === 0 ? 'Tắt' : (s === 1 ? 'Bật thủ công' : 'Tự động')}
+              </div>
+              <div class="iot-controls">
+                <button class="btn-iot ${s===0?'active-off':''}" onclick="setIot(${court.court_id}, 0)">Tắt</button>
+                <button class="btn-iot ${s===1?'active-on':''}" onclick="setIot(${court.court_id}, 1)">Bật</button>
+                <button class="btn-iot ${s===2?'active-auto':''}" onclick="setIot(${court.court_id}, 2)">Auto</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch(e) {
+    document.getElementById('iotGrid').innerHTML = `<div class="col-12 text-center text-danger">Lỗi kết nối API Backend</div>`;
+  }
+}
+
+async function setIot(courtId, status) {
+  try {
+    const res = await fetch(`${API}/courts/${courtId}/iot`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ iot_light_status: status })
+    });
+    const data = await res.json();
+    if(data.success) {
+      showToast(data.message, 'success');
+      loadIotCourts();
+    } else {
+      showToast(data.message, 'error');
+    }
+  } catch(e) {
+    showToast('Lỗi kết nối API', 'error');
+  }
+}
+
+function showToast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'au-toast';
+  t.style.borderLeftColor = type === 'success' ? 'var(--primary)' : 'var(--danger)';
+  t.textContent = msg;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
+loadIotCourts();
+</script>
+
+
+
+<script src="../assets/js/site-ui.js?v=2.8.0" defer></script>
+<script>document.querySelectorAll('a[href="../login.html"]').forEach(a=>a.addEventListener('click',async e=>{e.preventDefault();try{await fetch('/api/auth/logout',{method:'POST'});}catch(_){}sessionStorage.removeItem('au_user');location.href='../index.html';}));</script>
+</body>
+</html>

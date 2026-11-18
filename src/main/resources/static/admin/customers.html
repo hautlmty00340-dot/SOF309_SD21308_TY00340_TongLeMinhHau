@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Khách Hàng — Admin AU Badminton</title>
+  <link href="../assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/fontawesome.min.css?v=2.8.0"/>
+  <link rel="stylesheet" href="../assets/css/style.css?v=2.8.0"/>
+  <style>
+    body { background: var(--gray-50); }
+    .customer-row { background:var(--white); border-radius:var(--radius-md); border:1px solid var(--gray-200); padding:1rem 1.25rem; margin-bottom:0.75rem; display:flex; align-items:center; gap:1rem; }
+  </style>
+<script>
+
+function escHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+}
+</script>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+</head>
+<body class="admin-locked">
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng quản trị">
+<div class="sidebar-header"><a href="dashboard.html" class="sidebar-logo" style="text-decoration:none"><div class="sidebar-logo-icon">🏸</div><div><div class="sidebar-logo-text">AU Badminton</div><div class="sidebar-logo-sub">QUẢN TRỊ VẬN HÀNH</div></div></a></div>
+<div class="sidebar-section-label">Tổng quan</div>
+<a href="dashboard.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span><span>Tổng quan</span></a>
+<div class="sidebar-section-label">Quản lý</div>
+<a href="courts.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></span><span>Quản lý sân</span></a>
+<a href="bookings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span><span>Quản lý đặt sân</span></a>
+<a href="customers.html" class="sidebar-nav-item active"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Khách hàng</span></a>
+<div class="sidebar-section-label">IoT &amp; Hệ thống</div>
+<a href="iot.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span><span>Điều khiển đèn</span></a>
+<a href="report.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span>Báo cáo doanh thu</span></a>
+<a href="settings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Cài đặt</span></a>
+<div class="sidebar-footer"><div class="sidebar-user"><span class="au-avatar">A</span><div><strong>AU Workspace</strong><small>Quản trị viên</small></div></div>
+<a href="../account.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span>Hồ sơ của tôi</span></a>
+<a href="../login.html" class="sidebar-nav-item sidebar-logout"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span>Đăng xuất</span></a></div>
+</aside>
+
+  <div class="admin-content">
+    <div class="admin-topbar"><div><h2 style="font-size:1.1rem;font-weight:700;color:var(--gray-900);margin:0;">Danh Sách Khách Hàng</h2><p style="font-size:0.78rem;color:var(--gray-400);margin:0;">Tần suất đặt lịch và khách hàng thường xuyên</p></div></div>
+    <div class="admin-main">
+      <div class="au-card mb-4" style="padding:1.25rem;">
+        <div class="d-flex gap-3 flex-wrap">
+          <div style="text-align:center;flex:1;"><div id="totalCustomers" style="font-size:1.8rem;font-weight:800;color:var(--primary);">—</div><div style="font-size:0.78rem;color:var(--gray-400);">Khách Duy Nhất</div></div>
+          <div style="text-align:center;flex:1;"><div id="totalBookingsC" style="font-size:1.8rem;font-weight:800;color:var(--gray-800);">—</div><div style="font-size:0.78rem;color:var(--gray-400);">Tổng Lịch Đặt</div></div>
+          <div style="text-align:center;flex:1;"><div id="returnRate" style="font-size:1.8rem;font-weight:800;color:#F59E0B;">—</div><div style="font-size:0.78rem;color:var(--gray-400);">Khách Quay Lại</div></div>
+        </div>
+      </div>
+      <div id="customerList"></div>
+    </div>
+  </div>
+</div>
+<script>
+const API = '/api';
+async function loadCustomers() {
+  try {
+    const res = await fetch(`${API}/bookings`); const data = await res.json(); if (!data.success) throw new Error(data.message||'Không thể tải khách hàng');
+    const customerMap = {};
+    for (const b of data.data) {
+      if(b.status === 'CANCELLED') continue;
+      const key = b.customer_phone || b.customer_name;
+      if (!customerMap[key]) customerMap[key] = { name: b.customer_name, phone: b.customer_phone || '—', count: 0, total: 0 };
+      customerMap[key].count++; if (b.status === 'CONFIRMED') customerMap[key].total += Number(b.grand_total || b.court_amount);
+    }
+    const customers = Object.values(customerMap).sort((a,b) => b.count - a.count);
+    document.getElementById('totalCustomers').textContent = customers.length; document.getElementById('totalBookingsC').textContent = data.data.length; document.getElementById('returnRate').textContent = customers.filter(c => c.count > 1).length;
+    document.getElementById('customerList').innerHTML = customers.map(c => `
+      <div class="customer-row">
+        <div class="au-avatar">${(c.name || "K").charAt(0).toUpperCase()}</div>
+        <div style="flex:1;"><strong>${escHtml(c.name)}</strong><br><small style="color:var(--gray-400);">SĐT: ${escHtml(c.phone)}</small></div>
+        <div style="text-align:right;"><strong>${c.count} lần đặt</strong><br><small style="color:var(--primary); font-weight:700;">${c.total.toLocaleString('vi-VN')}đ</small></div>
+      </div>`).join('');
+  } catch (err) {document.getElementById('customerList').innerHTML='<div class="empty-block">Không tải được danh sách khách hàng. Vui lòng kiểm tra kết nối và thử lại.</div>';}
+}
+loadCustomers();
+</script>
+
+
+
+<script src="../assets/js/site-ui.js?v=2.8.0" defer></script>
+<script>document.querySelectorAll('a[href="../login.html"]').forEach(a=>a.addEventListener('click',async e=>{e.preventDefault();try{await fetch('/api/auth/logout',{method:'POST'});}catch(_){}sessionStorage.removeItem('au_user');location.href='../index.html';}));</script>
+</body>
+</html>

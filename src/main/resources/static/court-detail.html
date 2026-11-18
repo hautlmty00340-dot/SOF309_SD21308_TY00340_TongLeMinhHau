@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chi Tiết Sân Cầu Lông — AU Badminton</title>
+  <link href="assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/fontawesome.min.css?v=2.8.0" />
+  <link rel="stylesheet" href="assets/css/style.css?v=2.8.0" />
+  <style>
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .anim-fadeup { animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .delay-1 { animation-delay: 0.15s; }
+    .delay-2 { animation-delay: 0.3s; }
+
+    body { background: var(--gray-50); }
+    .img-gallery { display: grid; grid-template-columns: 2fr 1fr; gap: 0.5rem; border-radius: var(--radius-lg); overflow: hidden; height: 380px; }
+    .img-gallery img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s, opacity 0.2s; }
+    .img-gallery img:hover { opacity: 0.9; transform: scale(1.02); }
+    .img-gallery-right { display: grid; grid-template-rows: 1fr 1fr; gap: 0.5rem; }
+    
+    .info-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.85rem 0; border-bottom: 1px solid var(--gray-100); transition: background 0.2s; }
+    .info-row:hover { background: rgba(59,130,246,0.02); }
+    .info-row:last-child { border-bottom: none; }
+    .info-row-icon { width: 36px; height: 36px; background: var(--primary-light); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 0.9rem; flex-shrink: 0; transition: transform 0.2s; }
+    .info-row:hover .info-row-icon { transform: rotate(15deg) scale(1.1); }
+    
+    .info-row-label { font-size: 0.75rem; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .info-row-value { font-size: 0.9rem; color: var(--gray-800); font-weight: 600; margin-top: 0.1rem; }
+    
+    .time-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-top: 0.75rem; }
+    .time-slot { padding: 0.5rem; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); text-align: center; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; color: var(--gray-600); }
+    .time-slot:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); transform: translateY(-2px); }
+    .time-slot.selected { border-color: var(--primary); background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+    .time-slot.booked { background: var(--gray-100); color: var(--gray-400); cursor: not-allowed; text-decoration: line-through; transform: none !important; }
+    
+    .total-row { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-top: 1px solid var(--gray-200); font-weight: 600; }
+    .total-row.final { border-top: 2px solid var(--gray-800); margin-top: 0.25rem; font-size: 1.05rem; }
+    .total-row.final .amount { color: var(--primary); font-size: 1.2rem; font-weight: 800; }
+    
+    .payment-method { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+    .pay-option { flex: 1; padding: 0.75rem; border: 1.5px solid var(--gray-200); border-radius: var(--radius-md); text-align: center; cursor: pointer; transition: all 0.2s ease; font-size: 0.82rem; font-weight: 600; }
+    .pay-option:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .pay-option.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark); box-shadow: 0 4px 10px rgba(59,130,246,0.1); }
+    .pay-option .pay-icon { font-size: 1.3rem; display: block; margin-bottom: 0.25rem; }
+    .au-input.readonly { background-color: var(--gray-50); color: var(--gray-600); border-style: dashed; cursor: not-allowed; }
+  </style>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+</head>
+
+<body>
+  <nav class="au-navbar navbar navbar-expand-lg">
+    <div class="container">
+      <a href="index.html" class="au-logo">
+        <div class="au-logo-icon">🏸</div>
+        <div><div class="au-logo-text">AU Badminton</div><div class="au-logo-sub">Hệ Thống Đặt Sân</div></div>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navDetail"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="navDetail">
+        <div class="d-flex align-items-center gap-1 mx-auto mt-2 mt-lg-0">
+          <a href="index.html" class="au-nav-link">Trang Chủ</a>
+          <a href="courts.html" class="au-nav-link active">Danh Sách Sân</a>
+          <a href="booking-history.html" class="au-nav-link">Lịch Đặt</a>
+        </div>
+        <div class="d-flex align-items-center gap-2 mt-2 mt-lg-0">
+          <a href="booking-history.html" class="au-nav-link"><i class="fa-solid fa-clock-rotate-left me-1"></i>Lịch Sử</a>
+          <a href="login.html" class="au-avatar" style="text-decoration:none;">K</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding-top:2rem;padding-bottom:4rem;">
+    <div class="d-flex align-items-center gap-2 mb-4 anim-fadeup" style="font-size:0.82rem;">
+      <a href="index.html" style="color:var(--gray-400);text-decoration:none;">Trang Chủ</a>
+      <i class="fa-solid fa-chevron-right" style="font-size:0.65rem;color:var(--gray-400);"></i>
+      <a href="courts.html" style="color:var(--gray-400);text-decoration:none;">Danh Sách Sân</a>
+      <i class="fa-solid fa-chevron-right" style="font-size:0.65rem;color:var(--gray-400);"></i>
+      <span style="color:var(--primary);font-weight:600;" id="breadcrumbCourtName">Đang tải...</span>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7 anim-fadeup delay-1">
+        <div class="img-gallery mb-4">
+          <img src="assets/img/court_standard.png" alt="Ảnh chính" id="mainImg" />
+          <div class="img-gallery-right">
+            <img src="assets/img/court_vip.png" alt="Sân góc 2" onclick="swapImg(this)" />
+            <div style="position:relative;">
+              <img src="assets/img/hero_court_banner.png" alt="Toàn cảnh sân" onclick="swapImg(this)" />
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="swapImg(this.parentElement.querySelector('img'))">
+                <span style="color:white;font-size:0.85rem;font-weight:600;"><i class="fa-solid fa-images me-1"></i>+3 ảnh</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge-au badge-vip" id="lblCourtType">⭐ Standard</span>
+              <span class="status-pill available" style="font-size:0.75rem;"><span class="status-dot green"></span>Hệ Thống Live</span>
+              <span class="badge-au badge-iot-auto" style="font-size:0.7rem;">💡 IoT Auto</span>
+            </div>
+            <h1 style="font-size:1.6rem;font-weight:800;color:var(--gray-900);margin-bottom:0.25rem;" id="txtCourtName">Đang tải tên sân...</h1>
+            <p style="color:var(--gray-400);font-size:0.875rem;margin:0;"><i class="fa-solid fa-location-dot me-1"></i>AU Badminton · 123 Đường Thể Thao, Q.1</p>
+          </div>
+        </div>
+
+        <div class="au-card" style="margin-bottom:1.5rem;">
+          <div style="padding:1.25rem;">
+            <h4 style="font-size:0.95rem;font-weight:700;color:var(--gray-900);margin-bottom:0.5rem;">Thông Tin Sân</h4>
+            <div class="info-row">
+              <div class="info-row-icon"><i class="fa-solid fa-layer-group"></i></div>
+              <div>
+                <div class="info-row-label">Chất liệu bề mặt</div>
+                <div class="info-row-value" id="txtCourtTypeDetail">Thảm cao cấp chống trơn trượt</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-row-icon"><i class="fa-solid fa-ruler-combined"></i></div>
+              <div>
+                <div class="info-row-label">Kích Thước</div>
+                <div class="info-row-value">13.4m × 6.1m (Tiêu chuẩn Liên đoàn BWF)</div>
+              </div>
+            </div>
+            <div class="info-row">
+              <div class="info-row-icon" style="background:#DBEAFE;color:#1D4ED8;"><i class="fa-solid fa-robot"></i></div>
+              <div>
+                <div class="info-row-label">Đèn IoT thông minh</div>
+                <div class="info-row-value">Tự động kích hoạt chiếu sáng khi đến giờ đặt sân.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 anim-fadeup delay-2">
+        <div class="booking-form-card">
+          <div style="margin-bottom:1.25rem;">
+            <div style="font-size:0.75rem;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Giá Sân</div>
+            <div class="price-display"><span style="color:var(--primary);" id="txtPricePerHour">0đ</span> <span class="price-unit">/ giờ</span></div>
+          </div>
+
+          <form id="bookingForm">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div class="au-form-group">
+                <label class="au-label">Người Đặt</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-user input-icon" style="color:var(--gray-400);"></i>
+                  <input type="text" class="au-input readonly" id="customerName" readonly />
+                </div>
+              </div>
+              <div class="au-form-group">
+                <label class="au-label">Số Điện Thoại</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-phone input-icon" style="color:var(--gray-400);"></i>
+                  <input type="tel" class="au-input readonly" id="customerPhone" readonly />
+                </div>
+              </div>
+            </div>
+
+            <div class="au-form-group">
+              <label class="au-label" for="bookDate">Ngày Chơi</label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-calendar-days input-icon"></i>
+                <input type="date" class="au-input" id="bookDate" name="date" required />
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div class="au-form-group">
+                <label class="au-label" for="startTime">Giờ Bắt Đầu</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-clock input-icon"></i>
+                  <input type="time" class="au-input" id="startTime" name="start_time" required onchange="calcDuration()" />
+                </div>
+              </div>
+              <div class="au-form-group">
+                <label class="au-label" for="endTime">Giờ Kết Thúc</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-clock-rotate-left input-icon"></i>
+                  <input type="time" class="au-input" id="endTime" name="end_time" required onchange="calcDuration()" />
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-bottom:1.25rem;">
+              <div class="au-label">Khung Giờ Gợi Ý Nhanh</div>
+              <div class="time-slots">
+                <div class="time-slot" onclick="setTimeSlot('06:00','07:30',this)">06:00</div>
+                <div class="time-slot" onclick="setTimeSlot('07:30','09:00',this)">07:30</div>
+                <div class="time-slot" onclick="setTimeSlot('09:00','10:30',this)">09:00</div>
+                <div class="time-slot" onclick="setTimeSlot('15:30','17:00',this)">15:30</div>
+                <div class="time-slot" onclick="setTimeSlot('17:30','19:00',this)">17:30</div>
+                <div class="time-slot" onclick="setTimeSlot('19:00','20:30',this)">19:00</div>
+              </div>
+            </div>
+
+            <div class="au-form-group">
+              <div class="au-label">Phương Thức Thanh Toán</div>
+              <div class="payment-method">
+                <div class="pay-option active" onclick="selectPayment(this,'BANK_TRANSFER')"><span class="pay-icon">📱</span>Quét QR</div>
+                <div class="pay-option" onclick="selectPayment(this,'VNPAY')"><span class="pay-icon">💳</span>VNPay</div>
+                <div class="pay-option" onclick="selectPayment(this,'MOMO')"><span class="pay-icon">🩷</span>Ví MoMo</div>
+              </div>
+              <input type="hidden" name="payment_method" id="paymentInput" value="BANK_TRANSFER" />
+            </div>
+
+            <div id="summaryBox" style="background:var(--gray-50);border-radius:var(--radius-md);padding:1rem;margin-bottom:1.25rem;border:1px solid var(--gray-200);display:none;">
+              <div class="total-row" style="border:none;padding:0.25rem 0;font-size:0.85rem;">
+                <span>Thời gian chơi</span><span id="durationDisplay" style="color:var(--gray-800);">—</span>
+              </div>
+              <div class="total-row" style="border:none;padding:0.25rem 0;font-size:0.85rem;">
+                <span>Giá thuê/giờ</span><span id="txtPriceRow">—</span>
+              </div>
+              <div class="total-row final">
+                <span>Tổng Hóa Đơn</span><span class="amount" id="totalAmount">—</span>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-au-primary" style="width:100%;padding:0.9rem;font-size:0.95rem;">
+              <i class="fa-solid fa-calendar-check me-2"></i>Xác Nhận Đặt Sân
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const courtId = parseInt(urlParams.get('id')) || 1; 
+    let courtPricePerHour = 100000; // Giá mặc định dự phòng
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      let user;
+      try {
+        const response = await fetch(`${API}/auth/me`, {cache: 'no-store'});
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          sessionStorage.removeItem('au_user');
+          document.getElementById('customerName').value = '';
+          document.getElementById('customerPhone').value = '';
+          document.getElementById('bookDate').valueAsDate = new Date();
+          loadCourtData();
+          return;
+        }
+        user = data.user;
+        sessionStorage.setItem('au_user', JSON.stringify(user));
+      } catch (err) {
+        loadCourtData();
+        return;
+      }
+      if (user.role !== 'user') {
+        alert('⚠️ Bạn đang đăng nhập bằng tài khoản Admin. Hãy dùng tài khoản khách hàng để đặt sân.');
+        location.replace('admin/dashboard.html');
+        return;
+      }
+      document.getElementById('customerName').value = user.fullname || 'Khách Lẻ';
+      document.getElementById('customerPhone').value = user.phone || '';
+      
+      const avatarEl = document.querySelector('.au-avatar');
+      if (avatarEl) if (!user.avatar_image) avatarEl.textContent = (user.fullname || 'K')[0].toUpperCase();
+      
+      document.getElementById('bookDate').valueAsDate = new Date();
+
+      loadCourtData();
+    });
+
+    async function loadCourtData() {
+      try {
+        const res = await fetch(`${API}/courts/${courtId}`);
+        const data = await res.json();
+        if (data.success) {
+          const c = data.data.court;
+          courtPricePerHour = Number(c.price_per_hour);
+
+          document.getElementById('breadcrumbCourtName').textContent = c.name;
+          document.getElementById('txtCourtName').textContent = c.name;
+          document.getElementById('txtPricePerHour').textContent = courtPricePerHour.toLocaleString('vi-VN') + 'đ';
+          document.getElementById('lblCourtType').textContent = c.court_type;
+          document.getElementById('txtCourtTypeDetail').textContent = `Thảm ${c.court_type} — Tiêu chuẩn thi đấu chống trơn trượt`;
+
+          if(c.court_type.toUpperCase().includes('VIP')) {
+            document.getElementById('mainImg').src = 'assets/img/court_vip.png';
+          }
+        }
+      } catch (err) { console.error('Lỗi tải dữ liệu chi tiết sân:', err); }
+    }
+
+    function calcDuration() {
+      const s = document.getElementById('startTime').value;
+      const e = document.getElementById('endTime').value;
+      if (!s || !e) return;
+      const [sh, sm] = s.split(':').map(Number);
+      const [eh, em] = e.split(':').map(Number);
+      const mins = (eh * 60 + em) - (sh * 60 + sm);
+      if (mins <= 0) { alert('Giờ kết thúc phải lớn hơn giờ bắt đầu!'); return; }
+
+      const hours = mins / 60;
+      document.getElementById('durationDisplay').textContent = hours.toFixed(1) + ' giờ';
+      document.getElementById('txtPriceRow').textContent = courtPricePerHour.toLocaleString('vi-VN') + ' đ/giờ';
+      document.getElementById('summaryBox').style.display = 'block';
+
+      const totalCost = hours * courtPricePerHour;
+      document.getElementById('totalAmount').textContent = totalCost.toLocaleString('vi-VN') + ' đ';
+    }
+
+    function setTimeSlot(start, end, el) {
+      document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('startTime').value = start;
+      document.getElementById('endTime').value = end;
+      calcDuration();
+    }
+
+    function selectPayment(el, method) {
+      document.querySelectorAll('.pay-option').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('paymentInput').value = method;
+    }
+
+    function swapImg(img) {
+      const main = document.getElementById('mainImg');
+      const tmp = main.src; main.src = img.src; img.src = tmp;
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const date = document.getElementById('bookDate').value;
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const payment = document.getElementById('paymentInput').value;
+
+      if (!date || startTime >= endTime) { alert('❌ Ngày hoặc khung giờ không hợp lệ!'); return; }
+
+      const name = document.getElementById('customerName').value;
+      const phone = document.getElementById('customerPhone').value;
+
+      const submitBtn = this.querySelector('button[type="submit"]');
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang xử lý...';
+      submitBtn.disabled = true;
+
+      try {
+
+        const identityResponse = await fetch(`${API}/auth/me`, {cache: 'no-store'});
+        const identity = await identityResponse.json();
+        if (!identityResponse.ok || !identity.success || identity.user.role !== 'user') {
+          sessionStorage.removeItem('au_user');
+          alert('⚠️ Phiên hiện tại không phải tài khoản khách hàng. Hãy đăng nhập lại.');
+          location.href = 'login.html?next='+encodeURIComponent(location.pathname+location.search);
+          return;
+        }
+        if (identity.user.fullname !== name || identity.user.phone !== phone) {
+          sessionStorage.setItem('au_user', JSON.stringify(identity.user));
+          document.getElementById('customerName').value = identity.user.fullname || '';
+          document.getElementById('customerPhone').value = identity.user.phone || '';
+          alert('⚠️ Tài khoản đã thay đổi trong tab khác. Vui lòng kiểm tra tên rồi đặt lại.');
+          return;
+        }
+        const res = await fetch(`${API}/bookings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            court_id: courtId, date, start_time: startTime, end_time: endTime,
+            customer_name: name, customer_phone: phone, payment_method: payment, services: []
+          })
+        });
+        const data = await res.json();
+        if (data.success) { showBookingSuccess(data.booking_id || '??'); } 
+        else { alert('❌ ' + data.message); }
+      } catch (err) { alert('❌ Lỗi kết nối server!'); }
+      
+      finally {
+        submitBtn.innerHTML = '<i class="fa-solid fa-calendar-check me-2"></i>Xác Nhận Đặt Sân';
+        submitBtn.disabled = false;
+      }
+    });
+
+    function showBookingSuccess(bookingId) {
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;backdrop-filter:blur(4px);';
+      modal.innerHTML = `
+        <div style="background:white;border-radius:16px;padding:2.5rem;max-width:400px;width:90%;text-align:center;" class="anim-fadeup">
+          <div style="font-size:3.5rem;margin-bottom:1rem;">✅</div>
+          <h3 style="font-weight:800;color:#16A34A;margin-bottom:0.5rem;">Đặt Sân Thành Công!</h3>
+          <p style="color:#6B7280;font-size:0.9rem;margin-bottom:0.5rem;">Mã đặt sân của bạn:</p>
+          <div style="font-size:1.3rem;font-weight:800;color:#22C55E;font-family:monospace;margin-bottom:1.25rem;">#BK-${String(bookingId).padStart(5, '0')}</div>
+          <div style="display:flex;gap:0.75rem;">
+            <button onclick="window.location.href='courts.html'" style="flex:1;background:#F3F4F6;color:#374151;border:none;border-radius:8px;padding:0.75rem;font-weight:600;cursor:pointer;">Quay Lại</button>
+            <a href="booking-history.html" style="flex:1;background:#22C55E;color:white;border:none;border-radius:8px;padding:0.75rem;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;">Đến Lịch Sử →</a>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+  </script>
+<script src="assets/js/site-ui.js?v=2.8.0" defer></script>
+</body>
+</html>

@@ -1,78 +1,38 @@
-# Kế hoạch kiểm thử (Test Plan)
+# Test Plan — AU Badminton (Tuần 1)
 
-## Thông tin chung
+## Mục tiêu
 
-- **Dự án:** ShopPulse
-- **Sinh viên:** Tong Le Minh Hau — MSSV TY00340
-- **Phiên bản:** 1.0, tuần 1
-- **Tài liệu yêu cầu:** [SPECIFICATIONS.md](SPECIFICATIONS.md)
-- **Trạng thái kế hoạch:** Soạn xong; test case chưa thực thi.
+Xác nhận ứng dụng khởi động local, giao diện được phục vụ, các luồng cốt lõi tài khoản, tra cứu sân và đặt sân có thể được đặc tả và kiểm thử ở các tuần tiếp theo.
 
-## 1. Mục tiêu
+## Phạm vi
 
-- Xác nhận ứng dụng Spring Boot phục vụ giao diện và API tại `http://localhost:8080`.
-- Kiểm tra các luồng đăng ký, đăng nhập, session và quản lý sản phẩm qua REST API.
-- Kiểm tra validation dữ liệu, phân quyền theo session, kết quả HTTP và tính nhất quán dữ liệu sau CRUD.
-- Cung cấp test case nền cho tuần 2 (JUnit 5 Controller/Service) và các tuần automation sau.
+- Khởi chạy Spring Boot và kết nối SQL Server `AuDB`.
+- Trang chủ, danh sách sân, trang chi tiết.
+- Đăng ký, đăng nhập, đăng xuất và kiểm tra session.
+- Gửi đặt sân, kiểm tra lịch đặt và xem lịch sử.
+- Quyền quản trị cơ bản: quản lý sân/booking, thay đổi trạng thái IoT.
 
-## 2. Phạm vi
+## Ngoài phạm vi
 
-### Trong phạm vi
+Cổng thanh toán thật, SMS/email, phần cứng IoT, triển khai production, hiệu năng và bảo mật chuyên sâu.
 
-- Khởi động ứng dụng, trang tĩnh và API.
-- Đăng ký email/điện thoại, validation, trùng liên hệ, mật khẩu hash.
-- Đăng nhập đúng/sai; đọc tài khoản phiên; đăng xuất.
-- Liệt kê sản phẩm công khai; tạo/cập nhật/xóa sản phẩm với session.
-- Giá, số lượng, trường bắt buộc, tên sản phẩm trùng và ID không tồn tại.
+## Môi trường kiểm thử dự kiến
 
-### Ngoài phạm vi
+- Windows 10/11, JDK 17, Maven 3.8+, Microsoft SQL Server và SQL Server Management Studio.
+- Database `AuDB` được khởi tạo bằng `docs/database/migration_booking_detail.sql`.
+- Ứng dụng tại `http://localhost:8080/`; trình duyệt Chrome/Edge hiện hành.
+- Tài khoản và dữ liệu demo được tạo theo migration; không ghi mật khẩu thực vào test log.
 
-- Hiệu năng/tải, kiểm thử xâm nhập, OAuth, gửi email, giỏ hàng/đặt hàng/thanh toán.
-- Kiểm thử đầy đủ nhiều trình duyệt và thiết bị.
-- Độ bền dữ liệu sau restart: H2 đang chạy in-memory nên dữ liệu được reset.
+## Chiến lược
 
-## 3. Chiến lược kiểm thử
+1. **Smoke:** ứng dụng khởi động, trang chủ trả về, `/api/health` báo trạng thái.
+2. **Functional:** đăng ký/đăng nhập, xem sân, đặt sân hợp lệ, xem lịch sử.
+3. **Validation/boundary:** thiếu trường, sai định dạng liên hệ, thời gian không hợp lệ, sân không tồn tại.
+4. **Authorization:** khách chưa đăng nhập không được thao tác admin; user chỉ xem dữ liệu được phép.
+5. **Integration:** xác nhận request API ghi/đọc SQL Server đúng dữ liệu và session được giữ qua các request.
 
-1. **Smoke/manual:** khởi động bằng `mvn spring-boot:run`, mở trang chủ và gọi một endpoint đọc.
-2. **API functional:** dùng Postman, IntelliJ HTTP Client hoặc `curl`; theo thứ tự đăng ký/đăng nhập → sản phẩm → đăng xuất. Giữ cookie session cho các request cần xác thực.
-3. **Thiết kế dữ liệu:** phân vùng tương đương cho contact/password; giá trị biên 1, 0 và số âm cho giá/số lượng; kiểm tra trùng với khác chữ hoa/thường.
-4. **Tự động hóa kế tiếp:** tuần 2 viết JUnit 5 cho service/controller; tuần 3 trở đi mới mở rộng Selenium UI.
-5. Mỗi test case bắt đầu với database sạch hoặc dữ liệu định danh duy nhất (`contact`/tên sản phẩm có hậu tố riêng). Các test phụ thuộc session cần chạy cùng cookie jar.
+## Điều kiện bắt đầu và kết thúc
 
-## 4. Môi trường và dữ liệu
-
-- JDK 17+, Maven 3.8+; cổng TCP 8080 còn trống.
-- H2 in-memory; schema được tạo khi chạy ứng dụng; có ba sản phẩm demo ban đầu.
-- Tài khoản test tự đăng ký trong phiên chạy, ví dụ `qa+<mã-lần-chạy>@example.com`; không có sẵn tài khoản `admin`.
-- Gửi `Content-Type: application/json` cho các POST/PUT có body.
-
-## 5. Tiêu chí bắt đầu và kết thúc
-
-### Bắt đầu
-
-- Maven build được, ứng dụng khởi động và log báo server chạy ở cổng 8080.
-- Database H2 khởi tạo; `GET /api/products` trả HTTP 200.
-
-### Kết thúc
-
-- Toàn bộ test case mức P1 được chạy; không còn lỗi P1 mở.
-- Ghi kết quả thực tế và bằng chứng vào cột trạng thái/ghi chú trong `TEST_CASES.md` khi chạy.
-- Ở tuần 1 chỉ hoàn thành thiết kế test; chưa đánh dấu đạt cho đến khi có lần chạy thực tế.
-
-## 6. Mức độ ưu tiên
-
-- **P1:** khởi động, đăng ký, đăng nhập, session, validation căn bản, CRUD và phân quyền.
-- **P2:** kiểm tra biên độ dài/định dạng, tên trùng khác hoa thường, các trường tùy chọn và lỗi ID.
-
-## 7. Rủi ro và giả định
-
-- Backend chưa có UI quản trị CRUD; các test CRUD gọi API.
-- H2 in-memory không giữ tài khoản/sản phẩm qua lần khởi động lại.
-- Thông báo validation mặc định của Spring có thể khác nội dung cụ thể trong test; ưu tiên kiểm tra HTTP status và trường/lỗi nghiệp vụ.
-
-## 8. Sản phẩm bàn giao tuần 1
-
-- Backend Spring Boot và cấu hình H2.
-- Đặc tả nghiệp vụ, test plan và bộ test case.
-- Cách khởi chạy tại README.
-- Chưa bao gồm kết quả chạy test tự động; phần đó thuộc tuần tiếp theo.
+- **Bắt đầu:** JDK/Maven/SQL Server sẵn sàng, DB đã migrate, cấu hình kết nối hợp lệ.
+- **Kết thúc:** ghi kết quả từng test case, lưu log lỗi và bằng chứng; chỉ đánh dấu đạt khi quan sát thực tế.
+- Các test case trong file `TEST_CASES.md` hiện ở trạng thái **Chưa chạy**.

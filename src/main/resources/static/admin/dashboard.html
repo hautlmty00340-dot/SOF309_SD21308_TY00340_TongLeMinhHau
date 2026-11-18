@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <script>
+      if (["5500", "5501"].includes(location.port)) {
+        location.replace(
+          "http://localhost:8080" + location.pathname + location.search + location.hash,
+        );
+      }
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard — AU Badminton</title>
+    <link href="../assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/css/fontawesome.min.css?v=2.8.0" />
+    <link rel="stylesheet" href="../assets/css/style.css?v=2.8.0" />
+    <style>
+      body {
+        background: var(--gray-50);
+      }
+      .court-status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.75rem;
+      }
+      .court-status-tile {
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        border: 1.5px solid;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+      .court-status-tile.available {
+        border-color: var(--primary);
+        background: var(--primary-light);
+      }
+      .court-status-tile.occupied {
+        border-color: var(--danger);
+        background: #fee2e2;
+      }
+      .court-status-tile.available .ct-name {
+        color: var(--primary-dark);
+        font-weight: 800;
+        font-size: 1rem;
+      }
+      .court-status-tile.occupied .ct-name {
+        color: #b91c1c;
+        font-weight: 800;
+        font-size: 1rem;
+      }
+      .ct-time {
+        font-size: 0.85rem;
+        font-weight: 600;
+        opacity: 0.85;
+      }
+    </style>
+    <script>
+      function escHtml(value) {
+        return String(value ?? "").replace(
+          /[&<>"']/g,
+          (char) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[char],
+        );
+      }
+    </script>
+    <script>
+      document.documentElement.dataset.theme =
+        localStorage.getItem("au_theme") === "dark" ? "dark" : "light";
+    </script>
+  </head>
+  <body class="admin-locked">
+    <div class="admin-layout">
+      <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng quản trị">
+        <div class="sidebar-header">
+          <a href="dashboard.html" class="sidebar-logo" style="text-decoration: none"
+            ><div class="sidebar-logo-icon">🏸</div>
+            <div>
+              <div class="sidebar-logo-text">AU Badminton</div>
+              <div class="sidebar-logo-sub">QUẢN TRỊ VẬN HÀNH</div>
+            </div></a
+          >
+        </div>
+        <div class="sidebar-section-label">Tổng quan</div>
+        <a href="dashboard.html" class="sidebar-nav-item active"
+          ><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span
+          ><span>Tổng quan</span></a
+        >
+        <div class="sidebar-section-label">Quản lý</div>
+        <a href="courts.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></span
+          ><span>Quản lý sân</span></a
+        >
+        <a href="bookings.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span
+          ><span>Quản lý đặt sân</span></a
+        >
+        <a href="customers.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Khách hàng</span></a
+        >
+        <div class="sidebar-section-label">IoT &amp; Hệ thống</div>
+        <a href="iot.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span
+          ><span>Điều khiển đèn</span></a
+        >
+        <a href="report.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span
+          ><span>Báo cáo doanh thu</span></a
+        >
+        <a href="settings.html" class="sidebar-nav-item"
+          ><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Cài đặt</span></a
+        >
+        <div class="sidebar-footer">
+          <div class="sidebar-user">
+            <span class="au-avatar">A</span>
+            <div><strong>AU Workspace</strong><small>Quản trị viên</small></div>
+          </div>
+          <a href="../account.html" class="sidebar-nav-item"
+            ><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span
+            ><span>Hồ sơ của tôi</span></a
+          >
+          <a href="../login.html" class="sidebar-nav-item sidebar-logout"
+            ><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span
+            ><span>Đăng xuất</span></a
+          >
+        </div>
+      </aside>
+
+      <div class="admin-content">
+        <div class="admin-topbar">
+          <div>
+            <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--gray-900); margin: 0">
+              Tổng quan vận hành
+            </h2>
+            <p style="font-size: 0.78rem; color: var(--gray-400); margin: 0">
+              Theo dõi tình trạng sân và hoạt động đặt lịch
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 1rem">
+            <div class="au-avatar">A</div>
+          </div>
+        </div>
+
+        <div class="admin-main">
+          <div class="row g-3 mb-4">
+            <div class="col-md-3">
+              <div class="stat-card green">
+                <div class="stat-icon green">
+                  <i class="fa-solid fa-table-tennis-paddle-ball"></i>
+                </div>
+                <div class="stat-value" id="statCourts">0</div>
+                <div class="stat-label">Tổng Sân</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fa-solid fa-calendar-check"></i></div>
+                <div class="stat-value" id="statBookings">—</div>
+                <div class="stat-label">Đặt Sân Tháng Này</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card green">
+                <div class="stat-icon green"><i class="fa-solid fa-clock"></i></div>
+                <div class="stat-value" id="statPending">—</div>
+                <div class="stat-label">Chờ Duyệt</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card amber">
+                <div class="stat-icon amber"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                <div class="stat-value" id="statRevenue">—</div>
+                <div class="stat-label">Giá Trị Đơn Xác Nhận Tháng</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-lg-12">
+              <section class="dashboard-live-panel" aria-label="Tình trạng sân hiện tại">
+                <div class="dashboard-live-heading">
+                  <h5>Tình trạng sân theo lịch đã xác nhận</h5>
+                  <span class="dashboard-live-caption">Cập nhật theo thời gian hiện tại</span>
+                </div>
+                <div class="court-status-grid" id="liveCourtsGrid">
+                  <div class="text-center w-100" style="color: var(--gray-400)">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Đang tải dữ liệu sân...
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="au-card">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-100)">
+              <h5>Đặt Gần Đây</h5>
+            </div>
+            <table class="au-table">
+              <thead>
+                <tr>
+                  <th style="text-align: center">STT</th>
+                  <th>Mã ĐS</th>
+                  <th>Khách Hàng</th>
+                  <th>Sân</th>
+                  <th>Ngày & Giờ</th>
+                  <th>Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody id="recentBookingTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const API = "/api";
+
+      async function loadDashboard() {
+        try {
+          const res = await fetch(`${API}/bookings/stats/summary`);
+          const data = await res.json();
+          if (data.success) {
+            const d = data.data;
+            document.getElementById("statCourts").textContent = d.total_courts;
+            document.getElementById("statBookings").textContent = d.total_bookings;
+            document.getElementById("statPending").textContent = d.pending;
+            document.getElementById("statRevenue").textContent =
+              Number(d.total_revenue).toLocaleString("vi-VN") + "đ";
+          }
+          const courtsRes = await fetch(`${API}/courts`, { cache: "no-store" });
+          const courtsData = await courtsRes.json();
+          if (!courtsRes.ok || !courtsData.success)
+            throw Error(courtsData.message || "Không tải được trạng thái sân");
+          const allCourts = courtsData.data;
+
+          const bRes = await fetch(`${API}/bookings`, { cache: "no-store" });
+          const bData = await bRes.json();
+          if (!bRes.ok || !bData.success) throw Error(bData.message || "Không tải được lịch đặt");
+          if (bData.success) {
+            document.getElementById("recentBookingTbody").innerHTML = bData.data
+              .slice(0, 5)
+              .map(
+                (b, i) => `
+            <tr><td style="text-align:center;">${i + 1}</td><td><strong style="color:var(--primary);">#BK-${String(b.booking_id).padStart(5, "0")}</strong></td><td>${escHtml(b.customer_name)}</td><td>${escHtml(b.court_name)}</td><td>${b.date}</td><td>${b.status}</td></tr>`,
+              )
+              .join("");
+            updateLiveCourts(bData.data, allCourts);
+          }
+        } catch (e) {
+          document.getElementById("recentBookingTbody").innerHTML =
+            '<tr><td colspan="6" class="text-center">Không tải được dữ liệu. Hãy kiểm tra kết nối.</td></tr>';
+          document.getElementById("liveCourtsGrid").innerHTML =
+            '<div class="dashboard-live-empty">Không tải được tình trạng sân.</div>';
+        }
+      }
+
+      function updateLiveCourts(bookings, courts) {
+        const grid = document.getElementById("liveCourtsGrid");
+        if (!courts.length) {
+          grid.innerHTML =
+            '<div class="dashboard-live-empty">Chưa có sân nào trong hệ thống.</div>';
+          return;
+        }
+        const now = new Date();
+        const todayStr =
+          now.getFullYear() +
+          "-" +
+          String(now.getMonth() + 1).padStart(2, "0") +
+          "-" +
+          String(now.getDate()).padStart(2, "0");
+        const currentMins = now.getHours() * 60 + now.getMinutes();
+        grid.innerHTML = courts
+          .map((c) => {
+            const todayBookings = bookings.filter(
+              (b) =>
+                b.court_id === c.court_id &&
+                b.date &&
+                b.date.startsWith(todayStr) &&
+                b.status === "CONFIRMED",
+            );
+            let isOccupied = false,
+              currentBooking = null;
+            for (let b of todayBookings) {
+              const startMins =
+                parseInt(b.start_time.split(":")[0]) * 60 + parseInt(b.start_time.split(":")[1]);
+              const endMins =
+                parseInt(b.end_time.split(":")[0]) * 60 + parseInt(b.end_time.split(":")[1]);
+              if (currentMins >= startMins && currentMins < endMins) {
+                isOccupied = true;
+                currentBooking = b;
+                break;
+              }
+            }
+            if (isOccupied) {
+              return `<div class="court-status-tile occupied"><div class="ct-name">🔴 ${escHtml(c.name)}</div><div class="ct-time" style="color:#B91C1C;">${currentBooking.start_time.substring(0, 5)}–${currentBooking.end_time.substring(0, 5)}<br>👤 ${escHtml(currentBooking.customer_name)}</div></div>`;
+            } else {
+              return `<div class="court-status-tile available"><div class="ct-name">${escHtml(c.name)}</div><div class="ct-time" style="color:var(--primary);">✓ Trống</div></div>`;
+            }
+          })
+          .join("");
+      }
+      loadDashboard();
+      setInterval(() => {
+        if (localStorage.getItem("au_dashboard_refresh") !== "off" && !document.hidden)
+          loadDashboard();
+      }, 30000);
+    </script>
+
+    <script src="../assets/js/site-ui.js?v=2.8.0" defer></script>
+    <script>
+      document.querySelectorAll('a[href="../login.html"]').forEach((a) =>
+        a.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            await fetch("/api/auth/logout", { method: "POST" });
+          } catch (_) {}
+          sessionStorage.removeItem("au_user");
+          location.href = "../index.html";
+        }),
+      );
+    </script>
+  </body>
+</html>

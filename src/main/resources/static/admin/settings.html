@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cài Đặt — AU Badminton</title>
+  <link href="../assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/fontawesome.min.css?v=2.8.0"/>
+  <link rel="stylesheet" href="../assets/css/style.css?v=2.8.0"/>
+  <style>
+    body { background: var(--gray-50); }
+    .settings-card { background: var(--white); border-radius: var(--radius-md); padding: 1.5rem; border: 1px solid var(--gray-200); margin-bottom: 1.5rem;}
+  </style>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+<style>
+body{background:var(--gray-50)}.work-card{background:var(--white);border:1px solid var(--gray-200);border-radius:18px;padding:24px;box-shadow:var(--shadow-sm)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.kpi{background:var(--white);border:1px solid var(--gray-200);border-radius:17px;padding:20px}.kpi small{display:block;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);font-size:11px}.kpi strong{display:block;font-size:26px;margin-top:8px;color:var(--gray-900)}
+.work-form select,.work-form input{border:1px solid var(--gray-200);border-radius:10px;padding:10px 12px;background:var(--white);color:var(--gray-800);width:100%}
+.work-form label{font-size:12px;color:var(--gray-600);font-weight:700;display:block;margin-bottom:6px}.work-btn{background:#16a34a;color:white;border:0;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer}.work-btn:hover{background:#15803d}.work-btn.secondary{background:var(--gray-100);color:var(--gray-800);border:1px solid var(--gray-200)}
+#revenueChart{min-height:260px;display:flex;align-items:end;gap:7px;overflow-x:auto;padding:20px 4px 8px;border-bottom:1px solid var(--gray-200)}.chart-item{min-width:20px;flex:1;display:flex;align-items:center;flex-direction:column;justify-content:flex-end;gap:6px;min-height:210px}.chart-value{font-size:10px;color:var(--gray-400)}.chart-bar{width:100%;max-width:48px;background:linear-gradient(180deg,#51e69b,#0c9b55);min-height:2px;border-radius:7px 7px 2px 2px}.chart-item b{font-size:10px;color:var(--gray-400)}
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.status-chip{border-radius:12px;background:var(--gray-50);padding:12px;text-align:center}.status-chip strong{font-size:21px;display:block;color:var(--gray-900)}.status-chip span{color:var(--gray-400);font-size:12px}
+@media(max-width:980px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.kpi-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="admin-locked">
+<div class="admin-layout">
+
+  
+  <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng quản trị">
+<div class="sidebar-header"><a href="dashboard.html" class="sidebar-logo" style="text-decoration:none"><div class="sidebar-logo-icon">🏸</div><div><div class="sidebar-logo-text">AU Badminton</div><div class="sidebar-logo-sub">QUẢN TRỊ VẬN HÀNH</div></div></a></div>
+<div class="sidebar-section-label">Tổng quan</div>
+<a href="dashboard.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span><span>Tổng quan</span></a>
+<div class="sidebar-section-label">Quản lý</div>
+<a href="courts.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></span><span>Quản lý sân</span></a>
+<a href="bookings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span><span>Quản lý đặt sân</span></a>
+<a href="customers.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Khách hàng</span></a>
+<div class="sidebar-section-label">IoT &amp; Hệ thống</div>
+<a href="iot.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span><span>Điều khiển đèn</span></a>
+<a href="report.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span>Báo cáo doanh thu</span></a>
+<a href="settings.html" class="sidebar-nav-item active"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Cài đặt</span></a>
+<div class="sidebar-footer"><div class="sidebar-user"><span class="au-avatar">A</span><div><strong>AU Workspace</strong><small>Quản trị viên</small></div></div>
+<a href="../account.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span>Hồ sơ của tôi</span></a>
+<a href="../login.html" class="sidebar-nav-item sidebar-logout"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span>Đăng xuất</span></a></div>
+</aside>
+  
+
+  <div class="admin-content">
+<div class="admin-topbar"><div><h2 style="margin:0;font-size:20px;font-weight:800;color:var(--gray-900)">Cài đặt Workspace</h2><p style="margin:2px 0 0;color:var(--gray-400);font-size:12px">Điều hành sân, tài khoản và tùy chọn hệ thống</p></div></div>
+<main class="admin-main"><div class="row g-4">
+<div class="col-lg-7"><section class="work-card"><h3 style="font-size:18px;font-weight:800;color:var(--gray-900)">Thông tin cơ sở</h3><p style="font-size:12px;color:var(--gray-400)">Thông tin chính thức phục vụ vận hành sân</p>
+<form class="work-form" id="settingsForm">
+<div class="mb-3"><label for="business_name">Tên cơ sở</label><input id="business_name" maxlength="100" required></div>
+<div class="mb-3"><label for="business_address">Địa chỉ cơ sở chính</label><input id="business_address" maxlength="250" placeholder="Số nhà, đường, phường/xã, tỉnh/thành"><small class="admin-hint d-block mt-1">Địa chỉ hiển thị với khách hàng khi xem thông tin sân.</small></div>
+<div class="mb-3"><label for="support_phone">Điện thoại hỗ trợ</label><input id="support_phone" maxlength="24" inputmode="tel"></div>
+<div class="row g-3 mb-3"><div class="col-6"><label for="open_time">Giờ mở cửa</label><input type="time" id="open_time" required></div><div class="col-6"><label for="close_time">Giờ đóng cửa</label><input type="time" id="close_time" required></div></div>
+<div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" id="auto_approve"><label class="form-check-label" for="auto_approve" style="display:inline;margin-left:8px">Tự động xác nhận đơn mới</label><p class="mt-1" style="color:var(--gray-400);font-size:12px">Khi bật, đơn hợp lệ sẽ chuyển thẳng sang Xác nhận; khi tắt, đơn vào trạng thái Chờ duyệt.</p></div>
+<button type="submit" class="work-btn">Lưu cấu hình</button><span id="settingsNotice" role="status" style="font-size:12px;margin-left:12px"></span>
+</form></section></div>
+<div class="col-lg-5"><section class="work-card mb-4"><h3 style="font-size:18px;font-weight:800;color:var(--gray-900)">Tài khoản quản trị</h3><p style="font-size:12px;color:var(--gray-400)">Tên hiển thị, email công việc, ảnh đại diện và đổi mật khẩu được quản lý tại đây. Thông tin cá nhân không ảnh hưởng đến dữ liệu khách đặt sân.</p><a class="work-btn" style="display:inline-block;text-decoration:none" href="../account.html">Mở quản lý tài khoản</a></section>
+<section class="work-card mb-4"><h3 style="font-size:18px;font-weight:800;color:var(--gray-900)">Tình trạng hệ thống</h3><div id="healthInfo" style="font-size:13px;color:var(--gray-600);margin:15px 0">Đang kiểm tra kết nối...</div><button class="work-btn secondary" id="refreshHealth">Kiểm tra lại</button></section>
+<section class="work-card"><h3 style="font-size:18px;font-weight:800;color:var(--gray-900)">Công cụ điều hành</h3><p style="font-size:12px;color:var(--gray-400)">Truy cập nhanh các chức năng quản lý quan trọng</p><div style="display:flex;flex-wrap:wrap;gap:9px"><a class="work-btn secondary" href="bookings.html" style="text-decoration:none">Quản lý lịch</a><a class="work-btn secondary" href="courts.html" style="text-decoration:none">Quản lý sân</a><a class="work-btn secondary" href="report.html" style="text-decoration:none">Báo cáo</a></div></section></div>
+</div>
+<section class="work-card mt-4" aria-label="Công cụ quản trị">
+  <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-3"><div><span class="admin-kicker">BỘ CÔNG CỤ VẬN HÀNH</span><h3 style="font-size:18px;font-weight:800;color:var(--gray-900)">Tùy chọn hiển thị & chẩn đoán</h3><p class="admin-hint mb-0">Các tùy chọn chỉ áp dụng trên trình duyệt này, không thay đổi dữ liệu của khách hàng.</p></div><span class="admin-topbar-pill" id="currentVersion">Phiên bản —</span></div>
+  <div class="settings-tools-grid">
+    <div class="settings-tool"><h4><i class="fa-solid fa-palette"></i> Giao diện</h4><p>Chuyển chế độ sáng hoặc tối cho khách hàng và quản trị.</p><button class="work-btn secondary" type="button" id="settingThemeToggle">Đổi chế độ hiển thị</button></div>
+    <div class="settings-tool"><h4><i class="fa-solid fa-arrows-rotate"></i> Tự làm mới</h4><p>Tự cập nhật trạng thái sân và đơn đặt trên trang tổng quan.</p><label class="d-flex align-items-center gap-2" for="dashRefresh"><input id="dashRefresh" type="checkbox" class="form-check-input m-0"> Bật cập nhật định kỳ (30 giây)</label></div>
+    <div class="settings-tool"><h4><i class="fa-solid fa-shield-heart"></i> Kiểm tra hệ thống</h4><p>Kiểm tra kết nối và phiên bản ứng dụng trước khi trình diễn.</p><button class="work-btn secondary" type="button" id="systemDiagnostic">Chạy kiểm tra</button><div id="diagnosticNotice" class="admin-hint mt-2" role="status"></div></div>
+  </div>
+</section>
+</main></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+async function loadSettings(){const res=await fetch('/api/settings',{cache:'no-store'});const json=await res.json();if(!res.ok||!json.success)throw Error(json.message||'Không tải được cài đặt');
+for(const [key,value] of Object.entries(json.data)){if($(key)){$(key).type==='checkbox'?$(key).checked=value==='true':$(key).value=value}}}
+async function checkHealth(){try{const res=await fetch('/api/health');const json=await res.json();$('healthInfo').textContent=json.success?'● Máy chủ và cơ sở dữ liệu đang hoạt động':'● Kết nối cơ sở dữ liệu có vấn đề';$('healthInfo').style.color=json.success?'#16a34a':'#dc3545'}catch(err){$('healthInfo').textContent='● Không kết nối được máy chủ';$('healthInfo').style.color='#dc3545'}}
+$('refreshHealth').addEventListener('click',checkHealth);
+$('settingsForm').addEventListener('submit',async event=>{event.preventDefault();const submit=event.submitter;submit.disabled=true;
+const body={};for(const key of ['business_name','business_address','support_phone','open_time','close_time'])body[key]=$(key).value;body.auto_approve=String($('auto_approve').checked);
+try{const res=await fetch('/api/settings',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const json=await res.json();if(!res.ok||!json.success)throw Error(json.message||'Không thể lưu');$('settingsNotice').textContent='✓ Đã lưu thành công';$('settingsNotice').style.color='#16a34a';}
+catch(err){$('settingsNotice').textContent=err.message;$('settingsNotice').style.color='#dc3545'}finally{submit.disabled=false}});
+loadSettings().catch(err=>{$('settingsNotice').textContent=err.message;$('settingsNotice').style.color='#dc3545'});checkHealth();
+const refreshBox=$('dashRefresh');
+if(refreshBox){refreshBox.checked=localStorage.getItem('au_dashboard_refresh')!=='off';refreshBox.addEventListener('change',()=>localStorage.setItem('au_dashboard_refresh',refreshBox.checked?'on':'off'));}
+$('settingThemeToggle')?.addEventListener('click',()=>window.AU&&window.AU.setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+async function systemDiagnostic(){const box=$('diagnosticNotice');box.textContent='Đang kiểm tra…';
+try{const [v,h]=await Promise.all([fetch('/api/version',{cache:'no-store'}),fetch('/api/health',{cache:'no-store'})]);
+const version=await v.json(),health=await h.json();
+if(!v.ok||!version.success||!h.ok||!health.success)throw Error('Có dịch vụ chưa hoạt động');
+box.textContent='✓ Máy chủ V'+version.version+' · Cơ sở dữ liệu kết nối thành công';box.style.color='#16a34a';
+$('currentVersion').textContent='AU Badminton V'+version.version;
+}catch(err){box.textContent='Không đạt: '+err.message;box.style.color='#e04b5e';}}
+$('systemDiagnostic')?.addEventListener('click',systemDiagnostic);
+systemDiagnostic();
+</script>
+<script src="../assets/js/site-ui.js?v=2.8.0" defer></script>
+<script>document.querySelectorAll('a[href="../login.html"]').forEach(a=>a.addEventListener('click',async e=>{e.preventDefault();try{await fetch('/api/auth/logout',{method:'POST'});}catch(_){}sessionStorage.removeItem('au_user');location.href='../index.html';}));</script>
+</body></html>

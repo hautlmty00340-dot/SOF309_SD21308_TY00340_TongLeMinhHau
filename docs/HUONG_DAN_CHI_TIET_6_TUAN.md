@@ -32,32 +32,28 @@ flowchart TD
 
 ---
 
-### 🟢 TUẦN 1: KHỞI TẠO REPO, TÍCH HỢP WEB CŨ (Y1) & THIẾT KẾ TEST BẰNG AI (Y2)
+### 🟢 TUẦN 1: TÍCH HỢP AU BADMINTON, CHẠY LOCAL (Y1) & ĐẶC TẢ KIỂM THỬ (Y2)
 * **Thời gian:** 02/11 – 08/11/2026
-* **Mục tiêu hoàn thành:** Xong trọn vẹn **Y1** và khởi động **Y2**.
+* **Mục tiêu:** Thay ứng dụng mẫu bằng website AU Badminton, khởi chạy backend + frontend với database SQL Server và hoàn thiện đặc tả/test plan/test case.
 
-#### 1. Các bước thực hiện:
-* **Bước 1.1:** Truy cập Repo của Thầy: [https://github.com/tqbinh1268/SOF309-Kiem-Thu-Nang-Cao-Cung-AI](https://github.com/tqbinh1268/SOF309-Kiem-Thu-Nang-Cao-Cung-AI). Nhấn nút xanh **Use this template** $\rightarrow$ đặt tên Repo `SOF309_<MÃ_LỚP>_<MSSV>_<HọTên>` ở chế độ **Public**.
-* **Bước 1.2:** Clone repo về máy cá nhân và mở bằng IntelliJ IDEA / VS Code.
-* **Bước 1.3 (Tích hợp Web cũ):**
-  * Copy toàn bộ code Web Java từ kỳ trước dán vào: `src/main/java/` và `src/main/resources/`.
-  * Mở `pom.xml`, dán bổ sung các dependency của web cũ (Spring Boot, MySQL, Thymeleaf...).
-  * Khởi động web và kiểm tra tại `http://localhost:8080`: Xác nhận Đăng ký, Đăng nhập và ít nhất 1 chức năng CRUD hoạt động bình thường (**Xong Y1**).
-* **Bước 1.4 (Đặc tả nghiệp vụ):** Mở file `docs/SPECIFICATIONS.md`, mô tả chi tiết:
-  * URL các màn hình (`/login`, `/register`, `/products`).
-  * Danh sách các trường dữ liệu và ràng buộc validation (độ dài, ký tự đặc biệt, giá > 0...).
-* **Bước 1.5 (Ứng dụng AI + RAG):** Copy nội dung `docs/SPECIFICATIONS.md` gửi cho AI (ChatGPT/Claude/Gemini) với prompt:
-  > *"Bạn là QA Lead. Dưới đây là đặc tả nghiệp vụ dự án Web của tôi: [Dán nội dung]. Hãy áp dụng kỹ thuật Phân vùng tương đương và Phân tích giá trị biên để thiết kế Test Plan và Bộ Test Case chi tiết cho Controller và UI."*
-* **Bước 1.6:** Lưu kết quả vào `docs/TEST_PLAN.md`, `docs/TEST_CASES.md` và lưu câu lệnh prompt vào `docs/ai-logs/01_test_design_ai.md`.
+#### 1. Các bước thực hiện
+* **Bước 1.1 — Chuẩn bị database:** Cài/chạy SQL Server và mở SSMS. Chạy toàn bộ `docs/database/migration_booking_detail.sql` để tạo `AuDB`, các bảng cần thiết và dữ liệu demo nếu database đang trống.
+* **Bước 1.2 — Cấu hình kết nối:** Dùng JDK 17, Maven 3.8+; cấu hình `DB_URL`, `DB_USER`, `DB_PASSWORD` theo SQL Server trên máy. Không lưu mật khẩu thật vào Git.
+* **Bước 1.3 — Khởi chạy:** Từ thư mục gốc chạy `mvn spring-boot:run` hoặc `START_AU_BADMINTON.bat`; mở `http://localhost:8080/`. Kiểm tra trang chủ, `/api/health`, danh sách sân, đăng ký/đăng nhập và luồng tạo booking.
+* **Bước 1.4 — Đặc tả:** Cập nhật `docs/SPECIFICATIONS.md` theo vai trò khách/thành viên/admin; mô tả tài khoản, sân, đặt sân, lịch sử và các endpoint.
+* **Bước 1.5 — Thiết kế kiểm thử:** Hoàn thiện `docs/TEST_PLAN.md` và `docs/TEST_CASES.md`, bao gồm ca hợp lệ, dữ liệu thiếu/sai, giờ đặt trùng và kiểm tra quyền.
+* **Bước 1.6 — Minh chứng:** Lưu prompt và phần hỗ trợ của AI tại `docs/ai-logs/01_test_design_ai.md`; chỉ ghi kết quả test sau khi chạy thực tế.
 
-#### 2. Tiêu chí nghiệm thu Tuần 1:
+#### 2. Tiêu chí nghiệm thu Tuần 1
 - [ ] Repo cá nhân hiển thị trên GitHub đúng tên chuẩn.
-- [ ] Ứng dụng Web khởi động thành công ở local không bị lỗi.
-- [ ] Có đầy đủ 3 file: `docs/SPECIFICATIONS.md`, `docs/TEST_PLAN.md` và `docs/TEST_CASES.md`.
+- [ ] `AuDB` được tạo và ứng dụng kết nối SQL Server thành công.
+- [ ] Trang AU Badminton mở được tại `http://localhost:8080/` và API health trả trạng thái.
+- [ ] Các luồng đăng ký/đăng nhập, xem sân và gửi booking được kiểm tra trên local.
+- [ ] Có `docs/SPECIFICATIONS.md`, `docs/TEST_PLAN.md`, `docs/TEST_CASES.md`.
+- [ ] Các test case được ghi là **Chưa chạy** cho tới khi thực thi và có bằng chứng.
 - [ ] **Hạn nộp Google Classroom:** Chủ Nhật (08/11) - Nộp link GitHub Repo cá nhân.
 
 ---
-
 ### 🟢 TUẦN 2: VIẾT UNIT TEST CONTROLLER VỚI JUNIT 5 NÂNG CAO (Y3)
 * **Thời gian:** 09/11 – 15/11/2026
 * **Mục tiêu hoàn thành:** Xong trọn vẹn **Y3** (Toàn bộ Unit test cho Controller chạy pass 100%).
@@ -280,4 +276,5 @@ flowchart TD
   1. *Cách phân tích giá trị biên trong Test Case của bạn.*
   2. *Giải thích cấu trúc Page Object Model và cách tổ chức Locator.*
   3. *Chỉ ra điểm nào AI làm sai mà bạn đã tự tay chỉnh sửa lại.*
+
 

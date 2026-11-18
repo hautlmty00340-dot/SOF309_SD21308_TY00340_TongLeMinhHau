@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Báo Cáo Doanh Thu — AU Badminton</title>
+  <link href="../assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/fontawesome.min.css?v=2.8.0"/>
+  <link rel="stylesheet" href="../assets/css/style.css?v=2.8.0"/>
+  <style>
+    body { background: var(--gray-50); }
+    .report-card { background: var(--white); border-radius: var(--radius-md); padding: 1.5rem; border: 1px solid var(--gray-200); }
+    .stat-huge { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+  </style>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+<style>
+body{background:var(--gray-50)}.work-card{background:var(--white);border:1px solid var(--gray-200);border-radius:18px;padding:24px;box-shadow:var(--shadow-sm)}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.kpi{background:var(--white);border:1px solid var(--gray-200);border-radius:17px;padding:20px}.kpi small{display:block;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-400);font-size:11px}.kpi strong{display:block;font-size:26px;margin-top:8px;color:var(--gray-900)}
+.work-form select,.work-form input{border:1px solid var(--gray-200);border-radius:10px;padding:10px 12px;background:var(--white);color:var(--gray-800);width:100%}
+.work-form label{font-size:12px;color:var(--gray-600);font-weight:700;display:block;margin-bottom:6px}.work-btn{background:#16a34a;color:white;border:0;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer}.work-btn:hover{background:#15803d}.work-btn.secondary{background:var(--gray-100);color:var(--gray-800);border:1px solid var(--gray-200)}
+#revenueChart{min-height:260px;display:flex;align-items:end;gap:7px;overflow-x:auto;padding:20px 4px 8px;border-bottom:1px solid var(--gray-200)}.chart-item{min-width:20px;flex:1;display:flex;align-items:center;flex-direction:column;justify-content:flex-end;gap:6px;min-height:210px}.chart-value{font-size:10px;color:var(--gray-400)}.chart-bar{width:100%;max-width:48px;background:linear-gradient(180deg,#51e69b,#0c9b55);min-height:2px;border-radius:7px 7px 2px 2px}.chart-item b{font-size:10px;color:var(--gray-400)}
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.status-chip{border-radius:12px;background:var(--gray-50);padding:12px;text-align:center}.status-chip strong{font-size:21px;display:block;color:var(--gray-900)}.status-chip span{color:var(--gray-400);font-size:12px}
+@media(max-width:980px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.kpi-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="admin-locked">
+<div class="admin-layout">
+  
+  <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng quản trị">
+<div class="sidebar-header"><a href="dashboard.html" class="sidebar-logo" style="text-decoration:none"><div class="sidebar-logo-icon">🏸</div><div><div class="sidebar-logo-text">AU Badminton</div><div class="sidebar-logo-sub">QUẢN TRỊ VẬN HÀNH</div></div></a></div>
+<div class="sidebar-section-label">Tổng quan</div>
+<a href="dashboard.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span><span>Tổng quan</span></a>
+<div class="sidebar-section-label">Quản lý</div>
+<a href="courts.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></span><span>Quản lý sân</span></a>
+<a href="bookings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span><span>Quản lý đặt sân</span></a>
+<a href="customers.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Khách hàng</span></a>
+<div class="sidebar-section-label">IoT &amp; Hệ thống</div>
+<a href="iot.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span><span>Điều khiển đèn</span></a>
+<a href="report.html" class="sidebar-nav-item active"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span>Báo cáo doanh thu</span></a>
+<a href="settings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Cài đặt</span></a>
+<div class="sidebar-footer"><div class="sidebar-user"><span class="au-avatar">A</span><div><strong>AU Workspace</strong><small>Quản trị viên</small></div></div>
+<a href="../account.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span>Hồ sơ của tôi</span></a>
+<a href="../login.html" class="sidebar-nav-item sidebar-logout"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span>Đăng xuất</span></a></div>
+</aside>
+  
+
+  <div class="admin-content">
+<div class="admin-topbar"><div><h2 style="margin:0;font-size:20px;font-weight:800;color:var(--gray-900)">Phân tích doanh thu</h2><p style="margin:2px 0 0;color:var(--gray-400);font-size:12px">Theo dõi hiệu quả hoạt động theo kỳ</p></div><button class="work-btn secondary" id="exportCsv">Xuất CSV</button></div>
+<main class="admin-main">
+<div class="work-card work-form mb-4"><div class="row align-items-end g-3">
+<div class="col-md-3"><label for="reportMode">Phạm vi báo cáo</label><select id="reportMode"><option value="month">Theo tháng</option><option value="year">Theo năm</option></select></div>
+<div class="col-md-3"><label for="reportYear">Năm</label><select id="reportYear"></select></div>
+<div class="col-md-3" id="reportMonthWrap"><label for="reportMonth">Tháng</label><select id="reportMonth"></select></div>
+<div class="col-md-3"><button class="work-btn w-100" id="viewReport">Xem báo cáo</button></div>
+</div></div>
+<div id="reportStatus" role="status" class="mb-3" style="color:var(--gray-500);font-size:13px"></div>
+<div class="kpi-grid mb-4"><div class="kpi"><small>Giá trị đơn đã xác nhận</small><strong id="metricRevenue">—</strong></div>
+<div class="kpi"><small>Tổng số đơn</small><strong id="metricTotal">—</strong></div>
+<div class="kpi"><small>Đơn xác nhận</small><strong id="metricConfirmed">—</strong></div>
+<div class="kpi"><small>Tỷ lệ xác nhận</small><strong id="metricRate">—</strong></div></div>
+<div class="row g-4"><div class="col-xl-8"><section class="work-card h-100"><div class="d-flex justify-content-between align-items-center"><div><h3 style="font-size:17px;font-weight:800;color:var(--gray-900)">Xu hướng giá trị đơn</h3><p style="color:var(--gray-400);font-size:12px">Chỉ tính các đơn được xác nhận; không đồng nghĩa tiền đã thu</p></div></div><div id="revenueChart"></div></section></div>
+<div class="col-xl-4"><section class="work-card h-100"><h3 style="font-size:17px;font-weight:800;color:var(--gray-900)">Trạng thái đặt sân</h3><p style="font-size:12px;color:var(--gray-400)">Phân bổ số lượng đơn trong kỳ đã chọn</p><div class="status-grid"><div class="status-chip"><strong id="statusConfirmed">0</strong><span>Xác nhận</span></div><div class="status-chip"><strong id="statusPending">0</strong><span>Chờ duyệt</span></div><div class="status-chip"><strong id="statusCancelled">0</strong><span>Đã hủy</span></div></div><p style="margin-top:20px;font-size:13px;color:var(--gray-600)">Sử dụng bộ lọc để so sánh tình hình kinh doanh giữa các tháng hoặc các năm.</p></section></div></div>
+
+<div class="row g-4 mt-1">
+  <div class="col-xl-6"><section class="work-card h-100"><div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3"><div><h3 style="font-size:17px;font-weight:800;color:var(--gray-900)">Sân được đặt nhiều trong kỳ</h3><p class="admin-hint mb-0">Giá trị và số lượt đã xác nhận, xếp theo giá trị đơn</p></div></div><div id="topCourts" aria-live="polite" class="insight-list">Đang tải thống kê sân…</div></section></div>
+  <div class="col-xl-6"><section class="work-card h-100"><div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3"><div><h3 style="font-size:17px;font-weight:800;color:var(--gray-900)">Đơn mới trong kỳ</h3><p class="admin-hint mb-0">Năm đơn gần nhất theo mã đặt sân</p></div><a href="bookings.html" class="work-btn secondary" style="text-decoration:none">Xem tất cả</a></div><div id="recentReportOrders" class="insight-list" aria-live="polite">Đang tải danh sách…</div></section></div>
+</div>
+</main></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);let currentReport=null;
+const today=new Date();for(let y=today.getFullYear()+1;y>=2020;y--){const o=new Option(String(y),String(y));$('reportYear').add(o)}
+$('reportYear').value=String(today.getFullYear());for(let m=1;m<=12;m++)$('reportMonth').add(new Option('Tháng '+m,String(m)));
+$('reportMonth').value=String(today.getMonth()+1);
+$('reportMode').addEventListener('change',()=>{$('reportMonthWrap').hidden=$('reportMode').value==='year';loadReport()});
+$('viewReport').addEventListener('click',loadReport);
+$('reportYear').addEventListener('change',loadReport);$('reportMonth').addEventListener('change',loadReport);
+function money(v){return Number(v||0).toLocaleString('vi-VN')+'đ'}
+async function loadReport(){const mode=$('reportMode').value,year=Number($('reportYear').value),month=Number($('reportMonth').value);
+$('reportStatus').textContent='Đang tải thống kê...';try{const url=`/api/bookings/stats/revenue?mode=${mode}&year=${year}&month=${month}`;
+const res=await fetch(url,{cache:'no-store'});const result=await res.json();if(!res.ok||!result.success)throw Error(result.message||'Không tải được báo cáo');
+currentReport={mode,year,month,data:result.data};const data=result.data;
+$('metricRevenue').textContent=money(data.revenue);$('metricTotal').textContent=data.total;
+$('metricConfirmed').textContent=data.confirmed;$('metricRate').textContent=data.total?((data.confirmed/data.total)*100).toFixed(1)+'%':'0%';
+$('statusConfirmed').textContent=data.confirmed;$('statusPending').textContent=data.pending;$('statusCancelled').textContent=data.cancelled;
+const max=Math.max(1,...data.series.map(item=>Number(item.revenue)));const chart=$('revenueChart');chart.replaceChildren();
+data.series.forEach(p=>{const item=document.createElement('div');item.className='chart-item';item.title=`${mode==='year'?'Tháng':'Ngày'} ${p.period}: ${money(p.revenue)}, ${p.total} đơn`;
+const count=document.createElement('span');count.className='chart-value';const amount=Number(p.revenue||0);count.textContent=!amount?'':amount>=1e6?(amount/1e6).toFixed(1)+'tr':amount>=1e3?Math.round(amount/1e3)+'k':String(amount);
+const bar=document.createElement('div');bar.className='chart-bar';bar.style.height=(4+170*Number(p.revenue)/max)+'px';
+const label=document.createElement('b');label.textContent=mode==='year'?'T'+p.period:String(p.period);item.append(count,bar,label);chart.appendChild(item)});
+$('reportStatus').textContent=`Đã cập nhật báo cáo ${mode==='year'?'năm '+year:'tháng '+month+'/'+year}`;
+await loadBreakdowns(mode,year,month);
+}catch(err){$('reportStatus').textContent=err.message}}
+$('exportCsv').addEventListener('click',()=>{if(!currentReport)return;const {mode,year,month,data}=currentReport;
+const rows=[['Kỳ','Tổng đơn','Xác nhận','Chờ duyệt','Đã hủy','Giá trị đơn xác nhận (VND)'],...data.series.map(x=>[x.period,x.total,x.confirmed,x.pending,x.cancelled,x.revenue])];
+const content='\uFEFF'+rows.map(row=>row.join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'}));
+const a=document.createElement('a');a.href=url;a.download=`AU_Badminton_${mode}_${year}_${month}.csv`;a.click();URL.revokeObjectURL(url)});
+async function loadBreakdowns(mode,year,month) {
+  const top=$('topCourts'), recent=$('recentReportOrders');
+  try {
+    const response=await fetch('/api/bookings',{cache:'no-store'});
+    const result=await response.json();
+    if(!response.ok||!result.success)throw Error(result.message||'Không tải được đơn');
+    const orders=result.data.filter(b=>{
+      const d=String(b.date||'').slice(0,10);
+      return Number(d.slice(0,4))===year && (mode==='year'||Number(d.slice(5,7))===month);
+    }).sort((a,b)=>Number(b.booking_id)-Number(a.booking_id));
+    const group=new Map();
+    orders.filter(b=>b.status==='CONFIRMED').forEach(b=>{
+      const key=String(b.court_id);const x=group.get(key)||{name:b.court_name||'Sân '+key,count:0,sum:0};
+      x.count++;x.sum+=Number(b.court_amount||0);group.set(key,x);
+    });
+    const winners=[...group.values()].sort((a,b)=>b.sum-a.sum).slice(0,5);
+    top.replaceChildren();
+    if(!winners.length)top.innerHTML='<div class="empty-block">Chưa có đơn được xác nhận trong kỳ này.</div>';
+    winners.forEach((x,i)=>{
+      const el=document.createElement('div');el.className='insight-item';
+      const left=document.createElement('div');const name=document.createElement('strong');name.textContent=(i+1)+'. '+x.name;
+      const sub=document.createElement('small');sub.textContent=x.count+' lượt xác nhận';left.append(name,sub);
+      const sum=document.createElement('b');sum.textContent=money(x.sum);el.append(left,sum);top.append(el);
+    });
+    recent.replaceChildren();
+    if(!orders.length)recent.innerHTML='<div class="empty-block">Không có đơn đặt sân trong kỳ này.</div>';
+    orders.slice(0,5).forEach(b=>{
+      const el=document.createElement('div');el.className='insight-item';
+      const left=document.createElement('div');const name=document.createElement('strong');name.textContent='#BK-'+String(b.booking_id).padStart(5,'0')+' · '+(b.court_name||'Sân');
+      const sub=document.createElement('small');sub.textContent=String(b.date).slice(0,10)+' · '+({CONFIRMED:'Xác nhận',PENDING:'Chờ duyệt',CANCELLED:'Đã hủy'}[b.status]||b.status);
+      left.append(name,sub);const price=document.createElement('b');price.textContent=money(b.court_amount);el.append(left,price);recent.append(el);
+    });
+  } catch(e) {top.textContent='Không thể tải thống kê sân';recent.textContent='Không thể tải danh sách đơn';}
+}
+loadReport();
+</script>
+<script src="../assets/js/site-ui.js?v=2.8.0" defer></script>
+<script>document.querySelectorAll('a[href="../login.html"]').forEach(a=>a.addEventListener('click',async e=>{e.preventDefault();try{await fetch('/api/auth/logout',{method:'POST'});}catch(_){}sessionStorage.removeItem('au_user');location.href='../index.html';}));</script>
+</body></html>

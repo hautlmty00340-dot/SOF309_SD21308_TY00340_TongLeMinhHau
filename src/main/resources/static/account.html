@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tài khoản của tôi — AU Badminton</title>
+<link rel="stylesheet" href="assets/css/bootstrap.min.css?v=2.8.0">
+<link rel="stylesheet" href="assets/css/fontawesome.min.css?v=2.8.0">
+<link rel="stylesheet" href="assets/css/style.css?v=2.8.0">
+<style>
+.profile-wrap{max-width:1060px;margin:40px auto 80px;padding:0 18px}
+.profile-hero{background:linear-gradient(116deg,#152a28,#167145);color:#fff;border-radius:24px;padding:34px;display:flex;gap:22px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+.profile-hero .profile-large{width:92px;height:92px;font-size:34px;box-shadow:0 12px 30px #06281a55;border:3px solid #ffffff88;cursor:default}
+.profile-hero h1{font-size:28px;font-weight:800;margin:0}
+.profile-hero p{margin:4px 0 0;color:#d0eee1}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.account-card{border-radius:18px;padding:26px;border:1px solid #e2e8f0;background:#fff;box-shadow:0 8px 28px #1428370a}
+.account-card h2{font-size:19px;font-weight:800;color:var(--gray-900);margin:0 0 8px}
+.account-card p{font-size:13px;color:var(--gray-500);margin-bottom:22px}
+.account-card label{font-size:12px;color:var(--gray-600);font-weight:700;margin-bottom:7px;display:block}
+.account-card input,.account-card textarea,.account-card select{border:1px solid var(--gray-200);border-radius:10px;padding:11px 13px;width:100%;font-size:14px;background:var(--white);color:var(--gray-800)}
+.account-card input:focus,.account-card textarea:focus{outline:2px solid #22c55e75;border-color:var(--primary)}
+.field{margin-bottom:16px}.field small{display:block;margin-top:5px;color:var(--gray-400)}
+.account-button{padding:11px 18px;background:#18a94f;border:none;border-radius:10px;color:white;font-weight:700;font-size:13px;cursor:pointer}
+.account-button:disabled{opacity:.55}.account-button.secondary{background:var(--gray-100);border:1px solid var(--gray-200);color:var(--gray-800)}
+.account-button.danger{background:#dc3545}
+.avatar-presets{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.avatar-presets label{cursor:pointer}.avatar-presets input{position:absolute;opacity:0;width:1px;height:1px}
+.avatar-dot{display:block;width:43px;height:43px;border-radius:50%;border:3px solid transparent}
+.avatar-presets input:checked+.avatar-dot{outline:3px solid var(--primary);outline-offset:2px}
+.form-notice{margin-top:12px;font-size:13px;min-height:18px;color:var(--gray-600)}
+.form-notice.error{color:#dc3545}.form-notice.ok{color:#169d4c}
+.danger-section{border-color:#fecaca!important}
+@media(max-width:760px){.profile-grid{grid-template-columns:1fr}.profile-hero{padding:24px}}
+</style>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+</head>
+<body>
+<nav class="au-navbar navbar navbar-expand-lg"><div class="container">
+<a href="index.html" class="au-logo"><div class="au-logo-icon">🏸</div><div><div class="au-logo-text">AU Badminton</div><div class="au-logo-sub">Trải nghiệm đặt sân thuận tiện</div></div></a>
+<div class="d-flex align-items-center gap-3 ms-auto"><a href="index.html" class="au-nav-link">Trang chủ</a><a href="booking-history.html" class="au-nav-link">Lịch đặt</a><a href="login.html" class="au-avatar" title="Tài khoản">K</a></div>
+</div></nav>
+<main class="profile-wrap">
+<section class="profile-hero"><div id="profilePicture" class="au-avatar profile-large">K</div><div><h1 id="profileHeading">Tài khoản của tôi</h1><p id="profileUsername">Thông tin cá nhân và bảo mật</p></div></section>
+<div class="profile-grid">
+<section class="account-card">
+<h2><i class="fa-regular fa-address-card me-2"></i><span id="profileCardTitle">Thông tin cá nhân</span></h2><p id="profileCardHelp">Cập nhật thông tin liên hệ và địa chỉ của bạn.</p>
+<form id="profileForm">
+<div class="field"><label for="fullname">Họ và tên</label><input id="fullname" required minlength="2" maxlength="100"></div>
+<div class="field" data-customer-only><label for="phone">Số điện thoại</label><input id="phone" required pattern="\+?[0-9]{9,15}" inputmode="tel"></div>
+<div class="field"><label for="email">Email</label><input id="email" type="email" maxlength="150" placeholder="tenban@example.com"></div>
+<div class="field" data-customer-only><label for="address">Địa chỉ liên hệ</label><textarea id="address" rows="2" maxlength="250" placeholder="Số nhà, đường, phường/xã, tỉnh/thành"></textarea></div>
+<div class="field"><label>Chọn nền avatar</label><div id="avatarPresets" class="avatar-presets">
+<label><input type="radio" name="avatarStyle" value="forest" checked><span class="avatar-dot" style="background:linear-gradient(135deg,#17b35a,#087b47)"></span></label>
+<label><input type="radio" name="avatarStyle" value="ocean"><span class="avatar-dot" style="background:linear-gradient(135deg,#3498ff,#123e98)"></span></label>
+<label><input type="radio" name="avatarStyle" value="violet"><span class="avatar-dot" style="background:linear-gradient(135deg,#a77bff,#6130b5)"></span></label>
+<label><input type="radio" name="avatarStyle" value="sunset"><span class="avatar-dot" style="background:linear-gradient(135deg,#ffaf5b,#d94367)"></span></label>
+<label><input type="radio" name="avatarStyle" value="graphite"><span class="avatar-dot" style="background:linear-gradient(135deg,#68738b,#22293a)"></span></label>
+</div></div>
+<button class="account-button" type="submit">Lưu hồ sơ</button><div id="profileNotice" class="form-notice" aria-live="polite"></div>
+</form></section>
+<section class="account-card">
+<h2><i class="fa-regular fa-image me-2"></i>Ảnh đại diện</h2><p>Tải ảnh JPG, PNG hoặc WebP tối đa 2 MB. Ảnh chỉ dùng trong tài khoản hiện tại.</p>
+<form id="avatarForm"><div class="field"><label for="avatarFile">Chọn ảnh từ thiết bị</label><input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" required></div>
+<button type="submit" class="account-button">Cập nhật ảnh</button> <button type="button" class="account-button secondary" id="resetAvatar">Về avatar chữ</button>
+<div id="avatarNotice" class="form-notice" aria-live="polite"></div></form>
+<hr style="margin:24px 0">
+<h2><i class="fa-solid fa-key me-2"></i>Đổi mật khẩu</h2><p>Mật khẩu mới cần ít nhất 8 ký tự. Sau khi đổi, bạn sẽ được yêu cầu đăng nhập lại.</p>
+<form id="passwordForm" autocomplete="off">
+<div class="field"><label for="oldPass">Mật khẩu hiện tại</label><input id="oldPass" type="password" required autocomplete="current-password"></div>
+<div class="field"><label for="newPass">Mật khẩu mới</label><input id="newPass" type="password" required minlength="8" autocomplete="new-password"></div>
+<div class="field"><label for="confirmPass">Nhập lại mật khẩu mới</label><input id="confirmPass" type="password" required minlength="8" autocomplete="new-password"></div>
+<button class="account-button" type="submit">Xác nhận đổi mật khẩu</button><div id="passwordNotice" class="form-notice" aria-live="polite"></div>
+</form></section>
+<section class="account-card"><h2><i class="fa-solid fa-palette me-2"></i>Giao diện</h2><p>Chế độ giao diện được ghi nhớ trên trình duyệt này.</p><button type="button" class="account-button secondary" id="themeBtn">Chuyển sáng / tối</button></section>
+<section class="account-card danger-section" id="deleteSection"><h2 style="color:#cc3545"><i class="fa-solid fa-user-xmark me-2"></i>Xóa tài khoản vĩnh viễn</h2><p>Không thể hoàn tác. Hệ thống sẽ ẩn danh lịch sử cũ. Bạn cần hoàn tất hoặc hủy các lịch sắp tới trước khi xóa.</p>
+<form id="deleteForm"><div class="field"><label for="deletePassword">Nhập mật khẩu hiện tại</label><input id="deletePassword" type="password" required></div>
+<div class="field"><label for="deleteConfirm">Nhập chính xác XOA TAI KHOAN</label><input id="deleteConfirm" required autocomplete="off" placeholder="XOA TAI KHOAN"></div>
+<button class="account-button danger" type="submit">Yêu cầu xóa tài khoản</button><div class="form-notice" id="deleteNotice" aria-live="polite"></div></form></section>
+</div></main>
+<script src="assets/js/site-ui.js?v=2.8.0" defer></script>
+<script>
+const $ = id => document.getElementById(id);
+let currentUser;
+function notify(id,message,isError=false){const e=$(id);e.textContent=message;e.className='form-notice '+(isError?'error':'ok')}
+async function api(path,method,body){const response=await fetch('/api/auth/'+path,{method,headers:body instanceof FormData?{}:{'Content-Type':'application/json'},body:body instanceof FormData?body:JSON.stringify(body)});const json=await response.json();if(!response.ok||!json.success)throw Error(json.message||'Yêu cầu không thành công');return json;}
+async function refresh(){const response=await fetch('/api/auth/me',{cache:'no-store'});if(!response.ok){location.replace('login.html?next=%2Faccount.html');return;}const data=await response.json();if(!data.success)return;currentUser=data.user;
+$('fullname').value=currentUser.fullname||'';$('phone').value=currentUser.phone||'';$('email').value=currentUser.email||'';$('address').value=currentUser.address||'';
+$('profileHeading').textContent=currentUser.fullname;$('profileUsername').textContent='@'+currentUser.username;
+const preset=document.querySelector(`input[name="avatarStyle"][value="${currentUser.avatar_style||'forest'}"]`);if(preset)preset.checked=true;
+if(window.AU)window.AU.paintAvatar($('profilePicture'),currentUser);
+const admin=currentUser.role==='admin';
+ document.querySelectorAll('[data-customer-only]').forEach(el=>{el.hidden=admin;});
+ $('phone').required=!admin;
+ $('profileCardTitle').textContent=admin?'Hồ sơ quản trị viên':'Thông tin cá nhân';
+ $('profileCardHelp').textContent=admin?'Cập nhật tên hiển thị, email công việc và ảnh đại diện. Thông tin liên hệ cơ sở được cấu hình riêng tại trang quản trị.':'Cập nhật thông tin liên hệ của bạn.';
+ $('deleteSection').hidden=admin;}
+$('profileForm').addEventListener('submit',async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;try{const payload={fullname:$('fullname').value,email:$('email').value,avatar_style:document.querySelector('input[name="avatarStyle"]:checked').value};
+ if(currentUser?.role!=='admin'){payload.phone=$('phone').value;payload.address=$('address').value;}
+ await api('profile','PUT',payload);notify('profileNotice','Thông tin đã được lưu');await refresh();}catch(err){notify('profileNotice',err.message,true)}finally{btn.disabled=false}});
+$('avatarForm').addEventListener('submit',async e=>{e.preventDefault();const file=$('avatarFile').files[0];if(!file)return;const data=new FormData();data.append('file',file);try{await api('avatar','POST',data);notify('avatarNotice','Đã cập nhật ảnh đại diện');await refresh();}catch(err){notify('avatarNotice',err.message,true)}});
+$('resetAvatar').addEventListener('click',async()=>{try{await api('avatar','DELETE');notify('avatarNotice','Đã đặt lại ảnh đại diện');await refresh()}catch(err){notify('avatarNotice',err.message,true)}});
+$('passwordForm').addEventListener('submit',async e=>{e.preventDefault();try{await api('password','POST',{currentPassword:$('oldPass').value,newPassword:$('newPass').value,confirmPassword:$('confirmPass').value});notify('passwordNotice','Đổi mật khẩu thành công. Chuyển về đăng nhập...');setTimeout(()=>location.href='login.html',1000);}catch(err){notify('passwordNotice',err.message,true)}});
+$('deleteForm').addEventListener('submit',async e=>{e.preventDefault();if(!confirm('Bạn xác nhận xóa tài khoản vĩnh viễn? Không thể khôi phục sau khi xóa.'))return;try{await api('account','DELETE',{currentPassword:$('deletePassword').value,confirmation:$('deleteConfirm').value});sessionStorage.removeItem('au_user');location.href='index.html';}catch(err){notify('deleteNotice',err.message,true)}});
+$('themeBtn').addEventListener('click',()=>window.AU&&window.AU.setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
+document.addEventListener('DOMContentLoaded',()=>refresh().catch(()=>location.replace('login.html')));
+</script>
+</body></html>

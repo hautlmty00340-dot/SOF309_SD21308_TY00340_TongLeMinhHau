@@ -1,74 +1,59 @@
-# Đặc tả nghiệp vụ ShopPulse
+# Đặc tả nghiệp vụ — AU Badminton
 
-## 1. Thông tin dự án
+## 1. Thông tin hệ thống
 
-- **Tên đề tài:** ShopPulse — cửa hàng thương mại điện tử.
-- **Mục tiêu tuần 1:** Khởi chạy web local; có backend cho đăng ký, đăng nhập và CRUD sản phẩm; hoàn thiện đặc tả, test plan và test case.
-- **Nền tảng:** Java 17, Spring Boot 3, Spring MVC, Spring Data JPA, H2, HTML/CSS/JavaScript.
-- **URL local:** `http://localhost:8080`.
-- **API prefix:** `/api`.
-- **Database:** H2 in-memory. Dữ liệu bị xóa khi ứng dụng dừng; đây là cấu hình học tập/dev, chưa phải cấu hình triển khai thật.
+- **Mục tiêu Tuần 1:** tích hợp website đặt sân cầu lông có sẵn, chạy được local với backend và SQL Server, xác định yêu cầu nghiệp vụ và luồng kiểm thử.
+- **Stack:** Java 17, Spring Boot 3.2.3, Spring MVC/JDBC, Microsoft SQL Server; giao diện HTML, CSS, JavaScript, Bootstrap.
+- **Địa chỉ local:** `http://localhost:8080/`.
+- **Database:** `AuDB` trên SQL Server. Cần chạy `docs/database/migration_booking_detail.sql` trước lần khởi động đầu.
+- **Phiên:** HTTP session; client gửi cookie session cùng request.
 
-## 2. Vai trò và quy tắc nghiệp vụ
+## 2. Vai trò
 
-### 2.1 Tài khoản
+- **Khách:** xem trang chủ, danh sách/chi tiết sân, đăng ký/đăng nhập, gửi yêu cầu đặt sân.
+- **Thành viên:** xem lịch sử đặt sân và cập nhật thông tin cá nhân/avatar, đổi mật khẩu, yêu cầu xoá tài khoản.
+- **Quản trị viên:** xem thống kê và quản lý sân, trạng thái đèn IoT, đặt sân, ghi chú và cấu hình cơ sở.
 
-1. Người dùng đăng ký với họ tên, email hoặc số điện thoại Việt Nam, mật khẩu, xác nhận mật khẩu và đồng ý điều khoản.
-2. Họ tên được trim, bắt buộc từ 2 đến 100 ký tự.
-3. Email phải có dạng cơ bản `ten@mien.tld`. Số điện thoại chấp nhận `0` hoặc `+84`, theo sau là đầu số di động 3/5/7/8/9 và 8 chữ số.
-4. Mật khẩu dài 8–72 ký tự. Mật khẩu được lưu dưới dạng BCrypt hash; API không trả hash về client.
-5. Mật khẩu xác nhận phải trùng mật khẩu. Người đăng ký phải chọn đồng ý điều khoản.
-6. Email/số điện thoại đã tồn tại không thể đăng ký lần nữa (so sánh không phân biệt hoa thường).
-7. Đăng ký thành công tạo phiên đăng nhập. Đăng nhập nhận `identifier` (email hoặc điện thoại) và mật khẩu. Sai tài khoản hoặc mật khẩu trả cùng thông báo chung.
-8. `/api/auth/me` trả thông tin tài khoản của phiên hiện tại; chưa đăng nhập trả HTTP 401. `/api/auth/logout` hủy phiên.
+## 3. Luồng nghiệp vụ Tuần 1
 
-### 2.2 Sản phẩm
+1. Khách truy cập trang chủ; danh sách sân và giá được lấy từ backend.
+2. Khách có thể mở đăng ký hoặc đăng nhập. Đăng nhập thành công tạo session; thông tin phiên được lấy qua `/api/auth/me`.
+3. Khách chọn sân, ngày, giờ bắt đầu/kết thúc, phương thức thanh toán và gửi đặt sân. Server kiểm tra dữ liệu/khung giờ và ghi nhận đặt sân.
+4. Thành viên đã đăng nhập xem lịch sử của mình; quản trị viên xem và cập nhật danh sách booking.
+5. Người dùng đăng xuất để huỷ session.
 
-1. Danh sách sản phẩm đọc công khai qua API.
-2. Tạo, cập nhật và xóa sản phẩm yêu cầu phiên đăng nhập.
-3. Tên sản phẩm bắt buộc, tối đa 160 ký tự và không trùng (không phân biệt hoa thường). Danh mục bắt buộc, tối đa 60 ký tự.
-4. Giá bán bắt buộc và lớn hơn 0; giá gốc bắt buộc và không âm; số lượng bắt buộc và không âm.
-5. Không tìm thấy sản phẩm khi cập nhật/xóa trả HTTP 404. Tên trùng trả HTTP 409; dữ liệu không hợp lệ trả HTTP 400.
-6. Khi chạy lần đầu, ứng dụng thêm ba sản phẩm mẫu nếu bảng sản phẩm đang trống.
+## 4. Quy tắc dữ liệu và kiểm tra
 
-## 3. API contract
+- Sân phải tồn tại và được chọn; thời gian bắt đầu phải trước thời gian kết thúc.
+- Khung giờ không được trùng với booking đang hiệu lực trên cùng sân và ngày.
+- Số điện thoại là thông tin liên hệ của người đặt; trường bắt buộc phải có giá trị hợp lệ theo kiểm tra ở giao diện và backend.
+- Các thao tác quản trị yêu cầu session có role admin; request không đủ quyền bị từ chối.
+- Trạng thái booking dùng các giá trị nghiệp vụ như `PENDING`, `CONFIRMED`, `CANCELLED`.
+- Ảnh minh chứng thanh toán và avatar được tải lên theo giới hạn multipart trong cấu hình; file được truy cập qua `/uploads/**`.
+- Thiết lập kết nối database dùng biến môi trường `DB_URL`, `DB_USER`, `DB_PASSWORD`; không commit mật khẩu thật vào repo.
 
-Các request/response dùng JSON, trừ `204 No Content`. Phiên dùng cookie HTTP session do Spring quản lý.
+## 5. API contract quan trọng
 
-| Method | Endpoint | Quyền | Thành công |
-|---|---|---|---|
-| `POST` | `/api/auth/register` | Công khai | `201`, `{id, fullName, contact}` và tạo session |
-| `POST` | `/api/auth/login` | Công khai | `200`, `{id, fullName, contact}` và tạo session |
-| `GET` | `/api/auth/me` | Đã đăng nhập | `200` tài khoản hiện tại; chưa đăng nhập `401` |
-| `POST` | `/api/auth/logout` | Công khai | `204`, hủy session |
-| `GET` | `/api/products` | Công khai | `200`, mảng sản phẩm |
-| `POST` | `/api/products` | Đã đăng nhập | `201`, sản phẩm vừa tạo |
-| `PUT` | `/api/products/{id}` | Đã đăng nhập | `200`, sản phẩm đã cập nhật |
-| `DELETE` | `/api/products/{id}` | Đã đăng nhập | `204` |
+| Method | Endpoint | Mục đích |
+|---|---|---|
+| `GET` | `/api/courts` | Danh sách sân |
+| `GET` | `/api/courts/{id}` | Chi tiết sân và gợi ý lịch/booking liên quan |
+| `POST` | `/api/courts` | Thêm sân (admin) |
+| `PUT` | `/api/courts/{id}` | Cập nhật sân (admin) |
+| `PATCH` | `/api/courts/{id}/iot` | Cập nhật trạng thái IoT (admin) |
+| `DELETE` | `/api/courts/{id}` | Xoá sân (admin; phụ thuộc ràng buộc booking) |
+| `POST` | `/api/bookings` | Tạo đặt sân |
+| `GET` | `/api/bookings` | Danh sách booking theo quyền |
+| `GET` | `/api/bookings/{id}` | Chi tiết booking |
+| `PATCH` | `/api/bookings/{id}/status` | Cập nhật trạng thái (admin) |
+| `GET` | `/api/auth/me` | Người dùng hiện tại |
+| `POST` | `/api/auth/register` | Đăng ký tài khoản |
+| `POST` | `/api/auth/login` | Đăng nhập |
+| `POST` | `/api/auth/logout` | Đăng xuất |
+| `GET` | `/api/health` | Tình trạng ứng dụng và DB |
 
-### Ví dụ body
+Endpoint chi tiết khác gồm cập nhật hồ sơ/avatar/mật khẩu, báo cáo doanh thu, ghi chú booking và cấu hình. Hợp đồng đầu vào/đầu ra hiện được định nghĩa trong controller và giao diện; tài liệu này mô tả phạm vi Tuần 1 để tạo test plan.
 
-```json
-{
-  "fullName": "Nguyen Van An",
-  "contact": "an@example.com",
-  "password": "ShopPulse8",
-  "confirmPassword": "ShopPulse8",
-  "acceptTerms": true
-}
-```
+## 6. Ngoài phạm vi Tuần 1
 
-```json
-{
-  "name": "Tai nghe PulseTune",
-  "category": "Công nghệ",
-  "price": 780000,
-  "oldPrice": 950000,
-  "image": "https://example.com/pulse.jpg",
-  "quantity": 5
-}
-```
-
-## 4. Ngoài phạm vi tuần 1
-
-Thanh toán, đơn hàng, gửi email khôi phục mật khẩu, đăng nhập mạng xã hội, vai trò quản trị, bảo mật triển khai production, hiệu năng và kiểm thử bảo mật chuyên sâu chưa được triển khai. Giao diện danh mục trang chủ hiện có một số dữ liệu trình bày mẫu; CRUD sản phẩm được cung cấp qua REST API.
+Tích hợp cổng thanh toán thật, gửi SMS/email thật, điều khiển phần cứng IoT thật, triển khai production, kiểm thử tải và kiểm thử bảo mật chuyên sâu.

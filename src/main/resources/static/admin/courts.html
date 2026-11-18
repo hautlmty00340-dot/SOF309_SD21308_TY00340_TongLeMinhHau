@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản Lý Sân — Admin AU Badminton</title>
+  <link href="../assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet"/>
+  <link rel="stylesheet" href="../assets/css/fontawesome.min.css?v=2.8.0"/>
+  <link rel="stylesheet" href="../assets/css/style.css?v=2.8.0"/>
+  <style>
+    body { background: var(--gray-50); }
+    .court-table-img { width: 52px; height: 40px; border-radius: var(--radius-sm); object-fit: cover; }
+    .action-group { display: flex; gap: 0.4rem; justify-content: center; }
+    .icon-btn { width: 32px; height: 32px; border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.82rem; transition: var(--transition); }
+    .customer-badge { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; font-weight: 600; padding: 0.15em 0.5em; border-radius: 4px; font-size: 0.68rem; }
+    .badge-next { background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
+    .badge-playing { background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
+  </style>
+<script>
+
+function escHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+}
+</script>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+</head>
+<body class="admin-locked">
+<div class="admin-layout">
+  <aside class="admin-sidebar" id="adminSidebar" aria-label="Điều hướng quản trị">
+<div class="sidebar-header"><a href="dashboard.html" class="sidebar-logo" style="text-decoration:none"><div class="sidebar-logo-icon">🏸</div><div><div class="sidebar-logo-text">AU Badminton</div><div class="sidebar-logo-sub">QUẢN TRỊ VẬN HÀNH</div></div></a></div>
+<div class="sidebar-section-label">Tổng quan</div>
+<a href="dashboard.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span><span>Tổng quan</span></a>
+<div class="sidebar-section-label">Quản lý</div>
+<a href="courts.html" class="sidebar-nav-item active"><span class="nav-icon"><i class="fa-solid fa-table-tennis-paddle-ball"></i></span><span>Quản lý sân</span></a>
+<a href="bookings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span><span>Quản lý đặt sân</span></a>
+<a href="customers.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-users"></i></span><span>Khách hàng</span></a>
+<div class="sidebar-section-label">IoT &amp; Hệ thống</div>
+<a href="iot.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-lightbulb"></i></span><span>Điều khiển đèn</span></a>
+<a href="report.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span><span>Báo cáo doanh thu</span></a>
+<a href="settings.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-gear"></i></span><span>Cài đặt</span></a>
+<div class="sidebar-footer"><div class="sidebar-user"><span class="au-avatar">A</span><div><strong>AU Workspace</strong><small>Quản trị viên</small></div></div>
+<a href="../account.html" class="sidebar-nav-item"><span class="nav-icon"><i class="fa-solid fa-user-gear"></i></span><span>Hồ sơ của tôi</span></a>
+<a href="../login.html" class="sidebar-nav-item sidebar-logout"><span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span>Đăng xuất</span></a></div>
+</aside>
+
+  <div class="admin-content">
+    <div class="admin-topbar">
+      <div><h2 style="font-size:1.1rem;font-weight:700;color:var(--gray-900);margin:0;">Quản Lý Sân</h2></div>
+      <button class="btn-au-primary" type="button" id="addCourtButton"><i class="fa-solid fa-plus"></i> Thêm sân mới</button>
+    </div>
+    <div class="admin-main">
+      <div class="row g-3 mb-4">
+        <div class="col-3"><div class="stat-card green" style="padding:1rem;"><div style="display:flex;align-items:center;gap:0.75rem;"><div class="stat-icon green" style="width:38px;height:38px;font-size:1rem;margin:0;flex-shrink:0;"><i class="fa-solid fa-border-all"></i></div><div><div class="stat-value" style="font-size:1.5rem;" id="statTotalCourts">0</div><div class="stat-label">Tổng Sân</div></div></div></div></div>
+        <div class="col-3"><div class="stat-card blue" style="padding:1rem;"><div style="display:flex;align-items:center;gap:0.75rem;"><div class="stat-icon blue" style="width:38px;height:38px;font-size:1rem;margin:0;flex-shrink:0;"><i class="fa-solid fa-circle-check"></i></div><div><div class="stat-value" style="font-size:1.5rem;" id="statAvailable"><i class="fa-solid fa-spinner fa-spin" style="font-size:1rem;"></i></div><div class="stat-label">Đang Trống</div></div></div></div></div>
+        <div class="col-3"><div class="stat-card red" style="padding:1rem;"><div style="display:flex;align-items:center;gap:0.75rem;"><div class="stat-icon red" style="width:38px;height:38px;font-size:1rem;margin:0;flex-shrink:0;"><i class="fa-solid fa-ban"></i></div><div><div class="stat-value" style="font-size:1.5rem;" id="statOccupied"><i class="fa-solid fa-spinner fa-spin" style="font-size:1rem;"></i></div><div class="stat-label">Đang Có Người</div></div></div></div></div>
+        <div class="col-3"><div class="stat-card amber" style="padding:1rem;"><div style="display:flex;align-items:center;gap:0.75rem;"><div class="stat-icon amber" style="width:38px;height:38px;font-size:1rem;margin:0;flex-shrink:0;"><i class="fa-solid fa-lightbulb"></i></div><div><div class="stat-value" style="font-size:1.5rem;" id="statAutoIot">—</div><div class="stat-label">IoT Tự Động</div></div></div></div></div>
+      </div>
+
+      <div class="au-card" style="overflow:auto">
+        <div class="court-toolbar"><div><strong>Danh sách sân</strong><small>Quản lý giá thuê, loại sân và chế độ đèn</small></div><span id="courtNotice" role="status"></span></div>
+        <table class="au-table">
+          <thead><tr><th style="width:50px; text-align:center;">STT</th><th>Hình Ảnh</th><th>Tên Sân</th><th>Loại</th><th>Trạng Thái</th><th>Lịch Hôm Nay</th><th style="text-align:center">Thao tác</th></tr></thead>
+          <tbody id="courtTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="courtDialog" class="court-modal" hidden>
+  <div class="court-modal-backdrop" data-close-court></div>
+  <section class="court-modal-panel" role="dialog" aria-modal="true" aria-labelledby="courtDialogTitle">
+    <div class="court-modal-header"><div><small>QUẢN LÝ SÂN</small><h3 id="courtDialogTitle">Thêm sân mới</h3></div><button type="button" class="court-close" data-close-court aria-label="Đóng">×</button></div>
+    <form id="courtForm">
+      <input type="hidden" id="courtEditId">
+      <label for="courtName">Tên sân</label><input id="courtName" type="text" maxlength="100" required placeholder="Ví dụ: Sân Thảm 7 Standard">
+      <div class="court-form-grid"><div><label for="courtType">Loại sân</label><select id="courtType" required><option value="Standard">Standard</option><option value="Yonex VIP">Yonex VIP</option></select></div>
+      <div><label for="courtPrice">Giá thuê (đồng/giờ)</label><input id="courtPrice" type="number" min="1000" max="10000000" step="1000" required></div></div>
+      <label for="courtIot">Chế độ đèn</label><select id="courtIot"><option value="0">Tắt</option><option value="1">Bật thủ công</option><option value="2">Tự động theo lịch (mô phỏng)</option></select>
+      <p class="court-dialog-hint">Thay đổi giá thuê chỉ áp dụng cho lịch đặt mới. Lịch sử giao dịch được giữ nguyên.</p>
+      <div class="court-dialog-actions"><button type="button" class="work-btn secondary" data-close-court>Hủy</button><button type="submit" class="work-btn" id="courtSave">Lưu sân</button></div>
+      <div id="courtFormError" class="court-form-error" role="alert"></div>
+    </form>
+  </section>
+</div>
+<script>
+
+  const API = '/api';
+
+  let courtRows = [];
+  const notice = document.getElementById('courtNotice');
+  const dialog = document.getElementById('courtDialog');
+  const form = document.getElementById('courtForm');
+  const field = id => document.getElementById(id);
+  const formatPrice = amount => Number(amount || 0).toLocaleString('vi-VN') + 'đ';
+  function message(text, error=false) {
+    notice.textContent=text; notice.style.color=error?'#dc3545':'#0c9361';
+  }
+  function closeCourtDialog() { dialog.hidden=true; document.body.classList.remove('court-dialog-open'); field('courtFormError').textContent=''; }
+  function openCourtDialog(court=null) {
+    form.reset();field('courtFormError').textContent='';
+    field('courtEditId').value=court?.court_id||'';
+    field('courtDialogTitle').textContent=court?'Chỉnh sửa sân':'Thêm sân mới';
+    field('courtName').value=court?.name||'';
+    field('courtType').value=court?.court_type||'Standard';
+    if(court && ![...field('courtType').options].some(o=>o.value===court.court_type))field('courtType').add(new Option(court.court_type,court.court_type));
+    field('courtPrice').value=court?.price_per_hour??100000;
+    field('courtIot').value=String(court?.iot_light_status??0);
+    dialog.hidden=false;document.body.classList.add('court-dialog-open');field('courtName').focus();
+  }
+  document.getElementById('addCourtButton').addEventListener('click',()=>openCourtDialog());
+  dialog.querySelectorAll('[data-close-court]').forEach(el=>el.addEventListener('click',closeCourtDialog));
+  document.addEventListener('keydown',event=>{if(event.key==='Escape' && !dialog.hidden)closeCourtDialog()});
+  form.addEventListener('submit', async event=>{
+    event.preventDefault();
+    const id=field('courtEditId').value;
+    const body={name:field('courtName').value.trim(),court_type:field('courtType').value,
+      price_per_hour:Number(field('courtPrice').value),iot_light_status:Number(field('courtIot').value)};
+    if(!body.name||!Number.isFinite(body.price_per_hour)||body.price_per_hour<=0){field('courtFormError').textContent='Vui lòng nhập tên và giá thuê hợp lệ';return;}
+    field('courtSave').disabled=true;
+    try {
+      const result=await fetch(id?`${API}/courts/${id}`:`${API}/courts`,{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const data=await result.json();if(!result.ok||!data.success)throw Error(data.message||'Không lưu được sân');
+      closeCourtDialog();message(id?'Đã cập nhật sân':'Đã thêm sân mới');await loadCourts();
+    }catch(e){field('courtFormError').textContent=e.message;}
+    finally{field('courtSave').disabled=false;}
+  });
+  document.getElementById('courtTbody').addEventListener('click',async event=>{
+    const button=event.target.closest('button[data-court-action]');if(!button)return;
+    const court=courtRows.find(c=>c.court_id===Number(button.dataset.id));if(!court)return;
+    if(button.dataset.courtAction==='edit'){openCourtDialog(court);return;}
+    if(!confirm(`Xóa sân “${court.name}”? Chỉ xóa được sân chưa từng có lịch đặt.`))return;
+    button.disabled=true;
+    try {
+      const result=await fetch(`${API}/courts/${court.court_id}`,{method:'DELETE'});
+      const data=await result.json();if(!result.ok||!data.success)throw Error(data.message||'Không xóa được sân');
+      message('Đã xóa sân');await loadCourts();
+    }catch(e){message(e.message,true);button.disabled=false;}
+  });
+
+  async function loadCourts() {
+    try {
+      const res = await fetch(`${API}/courts`); const data = await res.json();
+      if (!res.ok||!data.success)throw Error(data.message||'Không tải được danh sách sân');
+      if (data.success) {
+        courtRows=data.data;
+        document.getElementById('statAutoIot').textContent=courtRows.filter(c=>Number(c.iot_light_status)===2).length;
+        document.getElementById('courtTbody').innerHTML = data.data.map((c, index) => `
+          <tr data-id="${c.court_id}">
+            <td style="text-align:center;">${index + 1}</td>
+            <td><div style="width:40px;height:40px;background:var(--gray-200);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🏸</div></td>
+            <td><div style="font-weight:600;">${escHtml(c.name)}</div><div class="court-name-cell" style="font-size:0.72rem;color:var(--gray-400);">ID: ${c.court_id} · ${formatPrice(c.price_per_hour)}/giờ</div></td>
+            <td><span class="badge-au ${String(c.court_type).includes('VIP') ? 'badge-vip' : 'badge-standard'}">${escHtml(c.court_type)}</span></td>
+            <td class="court-status-cell">—</td>
+            <td class="court-schedule-cell">—</td>
+            <td><div class="court-actions"><button class="court-edit" type="button" data-court-action="edit" data-id="${c.court_id}" title="Sửa sân"><i class="fa-solid fa-pen"></i> Sửa</button><button class="court-delete" type="button" data-court-action="delete" data-id="${c.court_id}" title="Xóa sân"><i class="fa-solid fa-trash"></i></button></div></td>
+          </tr>
+        `).join('');
+        loadCourtsLiveStatus();
+      }
+    } catch (e) { message(e.message,true); }
+  }
+
+  async function loadCourtsLiveStatus() {
+    try {
+      const res = await fetch(`${API}/bookings`); const data = await res.json(); if (!data.success) return;
+      const bookings = data.data; const now = new Date(); const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0'); const currentMins = now.getHours() * 60 + now.getMinutes();
+      let occupiedCount = 0; let totalCourts = 0;
+
+      document.querySelectorAll('#courtTbody tr').forEach(row => {
+        totalCourts++;
+        const courtId = parseInt(row.getAttribute('data-id')); if(!courtId) return;
+        const todayBookings = bookings.filter(b => b.court_id === courtId && b.date && b.date.startsWith(todayStr) && b.status === 'CONFIRMED'); todayBookings.sort((a,b) => a.start_time.localeCompare(b.start_time));
+        let isOccupied = false, currentBooking = null, nextBooking = null;
+        for (let b of todayBookings) {
+            const startMins = parseInt(b.start_time.split(':')[0])*60 + parseInt(b.start_time.split(':')[1]); const endMins = parseInt(b.end_time.split(':')[0])*60 + parseInt(b.end_time.split(':')[1]);
+            if (currentMins >= startMins && currentMins < endMins) { isOccupied = true; currentBooking = b; break; } else if (currentMins < startMins && !nextBooking) { nextBooking = b; }
+        }
+        const nameCell = row.querySelector('.court-name-cell'); const statusCell = row.querySelector('.court-status-cell'); const scheduleCell = row.querySelector('.court-schedule-cell');
+        const oldBadge = nameCell.querySelector('.customer-badge'); if(oldBadge) oldBadge.remove();
+        if (isOccupied) {
+            occupiedCount++;
+            const badge = document.createElement('span'); badge.className = 'customer-badge badge-playing'; badge.innerHTML = `<i class="fa-solid fa-user-check"></i> Đang chơi: ${escHtml(currentBooking.customer_name)}`; nameCell.appendChild(badge);
+            statusCell.innerHTML = `<span class="badge-au badge-cancelled">🔴 ĐANG CÓ NGƯỜI</span>`; scheduleCell.innerHTML = `<span>${currentBooking.start_time.substring(0,5)}–${currentBooking.end_time.substring(0,5)}</span>`;
+        } else {
+            statusCell.innerHTML = `<span class="badge-au badge-confirmed">✓ TRỐNG</span>`;
+            if (nextBooking) { const badge = document.createElement('span'); badge.className = 'customer-badge badge-next'; badge.innerHTML = `<i class="fa-solid fa-user-clock"></i> Sắp tới: ${escHtml(nextBooking.customer_name)}`; nameCell.appendChild(badge); }
+            scheduleCell.innerHTML = `<span>${todayBookings.length} lịch hôm nay</span>`;
+        }
+      });
+      document.getElementById('statTotalCourts').textContent = totalCourts;
+      document.getElementById('statOccupied').textContent = occupiedCount;
+      document.getElementById('statAvailable').textContent = totalCourts - occupiedCount;
+    } catch (e) { message('Không cập nhật được lịch sân: '+e.message,true); }
+  }
+  loadCourts();
+  setInterval(loadCourtsLiveStatus, 15000);
+</script>
+
+
+
+<script src="../assets/js/site-ui.js?v=2.8.0" defer></script>
+<script>document.querySelectorAll('a[href="../login.html"]').forEach(a=>a.addEventListener('click',async e=>{e.preventDefault();try{await fetch('/api/auth/logout',{method:'POST'});}catch(_){}sessionStorage.removeItem('au_user');location.href='../index.html';}));</script>
+</body>
+</html>

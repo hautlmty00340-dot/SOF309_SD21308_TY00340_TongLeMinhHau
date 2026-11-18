@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<script>
+
+if (['5500', '5501'].includes(location.port)) {
+  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+}
+</script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng Nhập — AU Badminton</title>
+  <meta name="description" content="Đăng nhập vào hệ thống đặt sân cầu lông AU Badminton."/>
+  <link href="assets/css/bootstrap.min.css?v=2.8.0" rel="stylesheet"/>
+  <link rel="stylesheet" href="assets/css/fontawesome.min.css?v=2.8.0"/>
+  <link rel="stylesheet" href="assets/css/style.css?v=2.8.0"/>
+  <style>
+    .password-toggle { position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--gray-400); cursor: pointer; font-size: 0.9rem; transition: color 0.2s; }
+    .password-toggle:hover { color: var(--primary); }
+    .form-error { font-size: 0.78rem; color: var(--danger); margin-top: 0.35rem; display: none; }
+    .au-input.error { border-color: var(--danger); }
+    .remember-row { display: flex; align-items: center; justify-content: space-between; }
+    .au-checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.85rem; color: var(--gray-600); }
+    .au-checkbox input { accent-color: var(--primary); width: 16px; height: 16px; cursor: pointer; }
+    .forgot-link { font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 500; cursor: pointer; }
+    .forgot-link:hover { text-decoration: underline; }
+    .floating-courts { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; gap: 1rem; z-index: 2; }
+    .floating-chip { background: rgba(255,255,255,0.12); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 0.75rem; font-weight: 500; padding: 0.4em 0.9em; border-radius: 99px; display: flex; align-items: center; gap: 5px; }
+    .floating-chip .dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; }
+    
+    /* CSS CHO MODAL QUÊN MẬT KHẨU */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; opacity: 0; pointer-events: none; transition: 0.3s; }
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    .modal-box { background: white; border-radius: var(--radius-lg); padding: 2.5rem 2rem; width: 90%; max-width: 420px; transform: translateY(-20px); transition: 0.3s; box-shadow: var(--shadow-lg); }
+    .modal-overlay.show .modal-box { transform: translateY(0); }
+    .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--gray-400); transition: 0.2s; }
+    .modal-close:hover { color: var(--danger); }
+
+    /* Authentication screen colors are scoped to these pages. */
+    .login-page {
+      --auth-card-bg: #ffffff;
+      --auth-title: #122033;
+      --auth-label: #415269;
+      --auth-muted: #62748a;
+      --auth-field-bg: #f7f9fc;
+      --auth-field-text: #1b2b40;
+      --auth-field-border: #d7e0ec;
+      --auth-placeholder: #718199;
+      --auth-line: #d8e1eb;
+      --auth-select-bg: #eef3f9;
+      min-height: 100vh;
+      height: auto;
+      padding: 3rem 1rem 7rem;
+      overflow: clip;
+    }
+    :root[data-theme="dark"] .login-page {
+      --auth-card-bg: #151e2c;
+      --auth-title: #f4f7fb;
+      --auth-label: #d0deec;
+      --auth-muted: #adbed1;
+      --auth-field-bg: #101827;
+      --auth-field-text: #f5f8fc;
+      --auth-field-border: #35455d;
+      --auth-placeholder: #9dacc0;
+      --auth-line: #34455c;
+      --auth-select-bg: #1b293c;
+    }
+    .login-page .login-card {
+      background: var(--auth-card-bg);
+      color: var(--auth-title);
+      border: 1px solid var(--auth-field-border);
+    }
+    .login-page .login-card h1 { color: var(--auth-title) !important; }
+    .login-page .login-card .au-label,
+    .login-page .login-card .au-checkbox { color: var(--auth-label) !important; }
+    .login-page .login-card .au-input {
+      color: var(--auth-field-text) !important;
+      background: var(--auth-field-bg) !important;
+      border-color: var(--auth-field-border) !important;
+    }
+    .login-page .login-card .au-input::placeholder {
+      color: var(--auth-placeholder) !important;
+      opacity: 1;
+    }
+    .login-page .login-card .au-input:focus {
+      border-color: #22c55e !important;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .22) !important;
+    }
+    .login-page .login-card .input-icon,
+    .login-page .login-card .password-toggle { color: var(--auth-muted); }
+    .login-page .login-card .login-divider { color: var(--auth-muted); }
+    .login-page .login-card .login-divider::before,
+    .login-page .login-card .login-divider::after { background: var(--auth-line); }
+    .login-page .login-card .phone-group {
+      background: var(--auth-field-bg);
+      border-color: var(--auth-field-border);
+    }
+    .login-page .login-card .phone-group:focus-within {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, .22);
+    }
+    .login-page .login-card .phone-group select {
+      color: var(--auth-field-text) !important;
+      background: var(--auth-select-bg) !important;
+      border-right-color: var(--auth-field-border);
+    }
+    .login-page .login-card .phone-group .au-input {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .login-page .floating-courts {
+      bottom: 1.4rem;
+      width: max-content;
+      max-width: calc(100% - 2rem);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    @media (max-width: 600px) {
+      .login-page { padding: 1.5rem .85rem 8.5rem; }
+      .login-page .login-card { width: 100%; padding: 2rem 1.3rem; }
+      .login-page .floating-courts { gap: .4rem; }
+      .login-page .floating-chip { font-size: .68rem; }
+    }
+    :root[data-theme="dark"] .modal-overlay .modal-box {
+      background: #151e2c;
+      color: #f4f7fb;
+      border: 1px solid #35455d;
+    }
+  </style>
+<script>document.documentElement.dataset.theme = localStorage.getItem("au_theme") === "dark" ? "dark" : "light";</script>
+</head>
+<body>
+<div class="login-page">
+  <div class="floating-courts">
+    <div class="floating-chip"><div class="dot"></div> 6 sân sẵn sàng phục vụ</div>
+    <div class="floating-chip">🏸 Đặt sân chỉ 30 giây</div>
+    <div class="floating-chip">💳 Thanh toán linh hoạt</div>
+  </div>
+
+  <div class="login-card anim-fadeup">
+    <div class="text-center mb-4">
+      <div class="login-logo">🏸</div>
+      <h1 style="font-size:1.5rem;font-weight:800;color:var(--auth-title);margin-bottom:0.25rem;">AU Badminton</h1>
+      <p style="color:var(--auth-muted);font-size:0.85rem;">Hệ thống đặt sân cầu lông chuyên nghiệp</p>
+    </div>
+
+    <form id="loginForm" novalidate>
+      <div class="au-form-group">
+        <label class="au-label" for="username">Tên đăng nhập</label>
+        <div class="input-icon-wrap">
+          <i class="fa-solid fa-user input-icon"></i>
+          <input type="text" class="au-input" id="username" name="username" placeholder="Nhập tên đăng nhập..." autocomplete="username" required/>
+        </div>
+        <div class="form-error" id="err-username">Vui lòng nhập tên đăng nhập.</div>
+      </div>
+
+      <div class="au-form-group">
+        <label class="au-label" for="password">Mật khẩu</label>
+        <div class="input-icon-wrap" style="position:relative;">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" class="au-input" id="password" name="password" placeholder="Nhập mật khẩu..." autocomplete="current-password" required style="padding-right:2.8rem;"/>
+          <span class="password-toggle" id="togglePassword">
+            <i class="fa-regular fa-eye" id="eyeIcon"></i>
+          </span>
+        </div>
+        <div class="form-error" id="err-password">Vui lòng nhập mật khẩu.</div>
+      </div>
+
+      <div class="au-form-group remember-row">
+        <label class="au-checkbox">
+          <input type="checkbox" name="remember" id="rememberMe"/> Ghi nhớ đăng nhập
+        </label>
+        <a class="forgot-link" onclick="openForgotModal()">Quên mật khẩu?</a>
+      </div>
+
+      <button type="submit" class="btn-au-primary w-100" id="loginBtn" style="width:100%;padding:0.85rem;">
+        <i class="fa-solid fa-right-to-bracket me-2"></i>Đăng Nhập
+      </button>
+
+      <div class="login-divider">hoặc</div>
+
+      <div style="text-align:center;font-size:0.85rem;color:var(--gray-400);">
+        Chưa có tài khoản?
+        <a href="signup.html" style="color:var(--primary);font-weight:600;text-decoration:none;"> Đăng ký ngay</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="forgotModal" role="dialog" aria-modal="true" aria-labelledby="resetHelpTitle">
+  <div class="modal-box" style="position:relative">
+    <button class="modal-close" type="button" onclick="closeForgotModal()" aria-label="Đóng"><i class="fa-solid fa-xmark"></i></button>
+    <div class="text-center mb-3"><div style="width:50px;height:50px;background:var(--primary-light);color:var(--primary-dark);border-radius:50%;display:grid;place-items:center;font-size:22px;margin:0 auto 14px"><i class="fa-solid fa-shield-halved"></i></div>
+    <h4 id="resetHelpTitle" style="font-weight:800;color:var(--gray-900)">Hỗ trợ khôi phục tài khoản</h4></div>
+    <p style="color:var(--gray-600);font-size:14px;line-height:1.7">Để bảo vệ tài khoản, hệ thống không tự đặt lại mật khẩu chỉ bằng tên đăng nhập hoặc số điện thoại. Vui lòng liên hệ quản trị viên tại cơ sở để được xác minh và hỗ trợ.</p>
+    <button type="button" class="btn-au-primary w-100" onclick="closeForgotModal()">Đã hiểu</button>
+  </div>
+</div>
+
+<script src="assets/js/bootstrap.bundle.min.js?v=2.8.0"></script>
+<script>
+  sessionStorage.removeItem('au_user');
+
+  document.getElementById('togglePassword').addEventListener('click', function() {
+    const pw = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (pw.type === 'password') {
+      pw.type = 'text'; icon.className = 'fa-regular fa-eye-slash';
+    } else {
+      pw.type = 'password'; icon.className = 'fa-regular fa-eye';
+    }
+  });
+
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); 
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    let valid = true;
+
+    document.getElementById('err-username').style.display = 'none';
+    document.getElementById('err-password').style.display = 'none';
+    document.getElementById('username').classList.remove('error');
+    document.getElementById('password').classList.remove('error');
+
+    if (!username) { document.getElementById('username').classList.add('error'); document.getElementById('err-username').style.display = 'block'; valid = false; }
+    if (!password) { document.getElementById('password').classList.add('error'); document.getElementById('err-password').style.display = 'block'; valid = false; }
+    if (!valid) return;
+
+    const btn = document.getElementById('loginBtn');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang đăng nhập...'; btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        sessionStorage.setItem('au_user', JSON.stringify(data.user));
+        const next = new URLSearchParams(location.search).get('next') || '';
+        const safeNext = /^\/(?:index|courts|court-detail|booking-history|account)\.html(?:\?[a-zA-Z0-9=&_-]*)?$/.test(next);
+        window.location.href = data.user.role === 'admin' ? 'admin/dashboard.html' : (safeNext ? next : 'index.html');
+      } else {
+        throw new Error(data.message || 'Sai tài khoản hoặc mật khẩu');
+      }
+    } catch (err) { showLoginError(err.message || 'Lỗi kết nối máy chủ'); }
+
+    btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i>Đăng Nhập'; btn.disabled = false;
+  });
+
+  function showLoginError(msg) {
+    let errDiv = document.getElementById('login-error-global');
+    if (!errDiv) {
+      errDiv = document.createElement('div'); errDiv.id = 'login-error-global';
+      errDiv.style.cssText = 'background:#FEE2E2;border:1px solid #FCA5A5;border-radius:8px;padding:0.75rem 1rem;font-size:0.85rem;color:#B91C1C;margin-bottom:1rem;text-align:center;';
+      document.getElementById('loginBtn').parentNode.insertBefore(errDiv, document.getElementById('loginBtn'));
+    }
+    errDiv.textContent = '❌ ' + msg;
+  }
+
+  function openForgotModal() { document.getElementById('forgotModal').classList.add('show'); }
+  function closeForgotModal() { document.getElementById('forgotModal').classList.remove('show'); }
+
+</script>
+<script src="assets/js/site-ui.js?v=2.8.0" defer></script>
+</body>
+</html>
