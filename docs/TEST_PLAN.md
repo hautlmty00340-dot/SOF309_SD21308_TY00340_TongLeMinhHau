@@ -7,10 +7,10 @@ Xác nhận ứng dụng khởi động local, giao diện được phục vụ,
 ## Phạm vi
 
 - Khởi chạy Spring Boot và kết nối SQL Server `AuDB`.
-- Trang chủ, danh sách sân, trang chi tiết.
-- Đăng ký, đăng nhập, đăng xuất và kiểm tra session.
-- Gửi đặt sân, kiểm tra lịch đặt và xem lịch sử.
-- Quyền quản trị cơ bản: quản lý sân/booking, thay đổi trạng thái IoT.
+- Trang chủ, danh sách sân, trang chi tiết (bao gồm trường hợp sân không tồn tại).
+- Đăng ký (kèm ràng buộc trùng username/số điện thoại), đăng nhập, đăng xuất và kiểm tra session.
+- Gửi đặt sân (chỉ tài khoản role `user`, khung giờ phải ở tương lai và không trùng lịch), kiểm tra lịch đặt và xem lịch sử.
+- Quyền quản trị: quản lý sân/booking, thay đổi trạng thái IoT, xác nhận booking; phân biệt rõ hành vi được phép của `user` (chỉ hủy đơn của mình) và `admin` (xác nhận/hủy, quản lý sân).
 
 ## Ngoài phạm vi
 
@@ -26,10 +26,10 @@ Cổng thanh toán thật, SMS/email, phần cứng IoT, triển khai production
 ## Chiến lược
 
 1. **Smoke:** ứng dụng khởi động, trang chủ trả về, `/api/health` báo trạng thái.
-2. **Functional:** đăng ký/đăng nhập, xem sân, đặt sân hợp lệ, xem lịch sử.
-3. **Validation/boundary:** thiếu trường, sai định dạng liên hệ, thời gian không hợp lệ, sân không tồn tại.
-4. **Authorization:** khách chưa đăng nhập không được thao tác admin; user chỉ xem dữ liệu được phép.
-5. **Integration:** xác nhận request API ghi/đọc SQL Server đúng dữ liệu và session được giữ qua các request.
+2. **Functional:** đăng ký/đăng nhập, xem sân, đặt sân hợp lệ (role `user`), xem lịch sử, admin xác nhận booking.
+3. **Validation/boundary:** thiếu trường, sai định dạng liên hệ, username/password/phone sai quy tắc, thời gian không hợp lệ hoặc trong quá khứ, sân không tồn tại, trùng username/số điện thoại khi đăng ký.
+4. **Authorization:** khách chưa đăng nhập hoặc user thường không được thao tác admin; admin không được tự đặt sân; user chỉ được hủy (không tự xác nhận) booking của chính mình.
+5. **Integration:** xác nhận request API ghi/đọc SQL Server đúng dữ liệu (ví dụ trùng khung giờ bị chặn ở DB) và session được giữ qua các request.
 
 ## Điều kiện bắt đầu và kết thúc
 
