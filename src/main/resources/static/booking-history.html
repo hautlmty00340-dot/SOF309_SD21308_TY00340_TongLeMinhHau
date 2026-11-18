@@ -4,8 +4,11 @@
 <head>
 <script>
 
-if (['5500', '5501'].includes(location.port)) {
-  location.replace('http://localhost:8080' + location.pathname + location.search + location.hash);
+if (["5500", "5501"].includes(location.port)) {
+  const pageName = location.pathname.split("/").pop() || "index.html";
+  const adminPage = location.pathname.toLowerCase().includes("/admin/");
+  const targetPath = (adminPage ? "/admin/" : "/") + pageName;
+  location.replace("http://127.0.0.1:8080" + targetPath + location.search + location.hash);
 }
 </script>
   <meta charset="UTF-8" />
