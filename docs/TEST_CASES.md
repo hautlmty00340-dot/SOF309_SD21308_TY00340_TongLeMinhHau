@@ -19,7 +19,7 @@
 | ID | Tính năng | Tiền điều kiện | Dữ liệu / thao tác | Kết quả mong đợi | Trạng thái |
 |---|---|---|---|---|---|
 | W1-ENV-01 | Khởi động | JDK 17, Maven 3.8+, SQL Server đang chạy; migration đã tạo `AuDB`; biến kết nối đúng | Chạy `mvn spring-boot:run` từ thư mục gốc | Spring Boot khởi động không lỗi và lắng nghe `127.0.0.1:8080` | Chưa chạy |
-| W1-ENV-02 | Trang chủ và tài nguyên | Ứng dụng đang chạy | Mở `http://localhost:8080/`; kiểm tra trang và request HTML/CSS/JS/ảnh trong DevTools Network | Trang AU Badminton hiển thị; tài nguyên giao diện được tải thành công | Chưa chạy |
+| W1-ENV-02 | Trang chủ và tài nguyên | Ứng dụng đang chạy | Mở `http://localhost:8080/`; kiểm tra trang và request HTML/CSS/JS/ảnh trong DevTools Network | Trang AU Badminton hiển thị; tài nguyên giao diện được tải thành công | Không đạt |
 | W1-ENV-03 | Health API khi DB hoạt động | Ứng dụng và `AuDB` hoạt động | Gửi `GET /api/health` | HTTP 200; body `success=true`, `status="OK"`, có `database` và `timestamp` | Chưa chạy |
 | W1-ENV-04 | Health API khi DB lỗi | Ứng dụng đang chạy nhưng cố ý cấu hình DB sai hoặc DB không khả dụng | Gửi `GET /api/health` | HTTP 200; body `success=false`, `status="ERROR"`, có thông báo không kết nối được DB. Không coi chỉ HTTP 200 là health thành công | Chưa chạy |
 | W1-COURT-01 | Danh sách sân | Có ít nhất một sân trong DB | Gọi `GET /api/courts`; đối chiếu tên, loại sân, giá và `live_status` | HTTP 200; dữ liệu sân đầy đủ. `live_status="OCCUPIED"` chỉ khi có booking `CONFIRMED` bao phủ thời điểm hiện tại; booking `PENDING` không làm sân thành `OCCUPIED` | Chưa chạy |
@@ -62,4 +62,4 @@
 
 | Test ID | Ngày chạy | Người chạy | Kết quả thực tế | Bằng chứng / ghi chú |
 |---|---|---|---|---|
-| — | — | — | Chưa chạy | — |
+| W1-ENV-02 | 24/11/2026 | Người dùng | Trang chủ hiển thị trắng, không có nội dung | Kết quả do người dùng báo trong chat; chưa có ảnh trang trắng hoặc log Network |
